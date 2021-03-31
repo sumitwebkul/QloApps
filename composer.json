@@ -9,5 +9,8 @@
             "email": "support@qloapps.com"
         }
     ],
+    "require": {
+        "jakeasmith/http_build_url": "^1"
+    },
     "minimum-stability": "dev"
 }
