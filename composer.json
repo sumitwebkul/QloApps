@@ -9,5 +9,8 @@
             "email": "support@qloapps.com"
         }
     ],
+    "require": {
+        "mobiledetect/mobiledetectlib": "~2.8.22"
+    },
     "minimum-stability": "dev"
 }
