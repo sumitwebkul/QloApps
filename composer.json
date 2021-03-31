@@ -9,5 +9,8 @@
             "email": "support@qloapps.com"
         }
     ],
+    "require": {
+        "geoip2/geoip2": "~2.4.2"
+    },
     "minimum-stability": "dev"
 }
