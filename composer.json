@@ -9,5 +9,8 @@
             "email": "support@qloapps.com"
         }
     ],
+    "require": {
+        "tecnickcom/tcpdf": "6.2.12"
+    },
     "minimum-stability": "dev"
 }
