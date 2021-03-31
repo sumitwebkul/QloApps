@@ -107,10 +107,12 @@ if (!defined('_PS_GEOIP_DIR_')) {
 if (!defined('_PS_GEOIP_CITY_FILE_')) {
     define('_PS_GEOIP_CITY_FILE_',       'GeoLiteCity.dat');
 }
-define('_PS_PEAR_XML_PARSER_PATH_',  _PS_TOOL_DIR_.'pear_xml_parser/');
+define('_PS_PEAR_XML_PARSER_PATH_',  _PS_VENDOR_DIR_.'pear_xml_parser/');
 define('_PS_SWIFT_DIR_',             _PS_TOOL_DIR_.'swift/');
 define('_PS_TAASC_PATH_',            _PS_TOOL_DIR_.'taasc/');
 define('_PS_TCPDF_PATH_',            _PS_TOOL_DIR_.'tcpdf/');
+
+define('_PS_VENDOR_DIR_', _PS_CORE_DIR_.'/vendor/');
 
 if (!defined('_PS_IMG_DIR_')) {
     define('_PS_IMG_DIR_',               _PS_ROOT_DIR_.'/img/');
