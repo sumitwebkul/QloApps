@@ -378,11 +378,6 @@ class HotelAdvancedPayment extends ObjectModel
                     $idProduct = $product['id_product'];
                     if ($advPaymentInfo = $this->getIdAdvPaymentByIdProduct($idProduct)) {
                         if ($advPaymentInfo['active']) {
-                            // if no impact on price with advancne payment then no need of advance payment
-                            if ($context->cart->getOrderTotal() == $context->cart->getOrderTotal(true, CART::ADVANCE_PAYMENT)) {
-                                return false;
-                            }
-
                             return true;
                         }
                     }
