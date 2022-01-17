@@ -474,14 +474,15 @@ class HookCore extends ObjectModel
             $output = '';
         }
 
+        if (Module::isInstalled('hotelreservationsystem')) {
+            include_once _PS_MODULE_DIR_.'hotelreservationsystem/classes/HotelHelper.php';
+            $idHtlResvMod = Module::getModuleIdByName('hotelreservationsystem');
+        }
         if ($disable_non_native_modules && !isset(Hook::$native_module)) {
             Hook::$native_module = Module::getNativeModuleList();
-            if (Module::isInstalled('hotelreservationsystem')) {
-                include_once _PS_MODULE_DIR_.'hotelreservationsystem/classes/HotelHelper.php';
-                $qloNativeMods = array();
-                if ($qloNativeMods = HotelHelper::getQloNativeModules()) {
-                    Hook::$native_module = array_merge(Hook::$native_module, $qloNativeMods);
-                }
+            $qloNativeMods = array();
+            if ($qloNativeMods = HotelHelper::getQloNativeModules()) {
+                Hook::$native_module = array_merge(Hook::$native_module, $qloNativeMods);
             }
         }
 
@@ -532,7 +533,11 @@ class HookCore extends ObjectModel
                     continue;
                 }
                 if (Validate::isLoadedObject($context->employee) && !Module::getPermissionStatic($array['id_module'], 'view', $context->employee)) {
-                    continue;
+                    // skip checking permission when validateOrder hook in hotelreservationsystem module
+                    // as booking information entries are done in this hook for order creation
+                    if ($idHtlResvMod != $array['id_module'] && $hook_name != 'validateOrder') {
+                        continue;
+                    }
                 }
             }
 
