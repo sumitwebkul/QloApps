@@ -43,7 +43,7 @@
 				<a href="javascript:void(0);" onclick="dashgoals_changeYear('backward');" class="btn btn-default btn-xs"><i class="icon-backward"></i></a>
 				<a href="javascript:void(0);" onclick="dashgoals_changeYear('forward');" class="btn btn-default btn-xs"><i class="icon-forward"></i></a>
 			</span>
-			
+
 			<span class="panel-heading-action">
 				<a class="list-toolbar-btn" href="javascript:void(0);" onclick="toggleDashConfig('dashgoals');" title="{l s="Configure" mod="dashtrends"}">
 					<i class="process-icon-configure"></i>

@@ -87,6 +87,38 @@ class DashProducts extends Module
 		return $this->display(__FILE__, 'dashboard_zone_two.tpl');
 	}
 
+    // Validation of the configuration form
+    public function validateDashConfig($configs)
+    {
+        $errors = [];
+
+        if (!Validate::isUnsignedInt($configs['DASHPRODUCT_NBR_SHOW_LAST_ORDER'])
+            || !$configs['DASHPRODUCT_NBR_SHOW_LAST_ORDER']
+        ) {
+            $errors[] = $this->l('Number of recent bookings must be a positive integer.');
+        }
+
+        if (!Validate::isUnsignedInt($configs['DASHPRODUCT_NBR_SHOW_BEST_SELLER'])
+            || !$configs['DASHPRODUCT_NBR_SHOW_BEST_SELLER']
+        ) {
+            $errors[] = $this->l('Number of best selling must be a positive integer.');
+        }
+
+        if (!Validate::isUnsignedInt($configs['DASHPRODUCT_NBR_SHOW_MOST_VIEWED'])
+            || !$configs['DASHPRODUCT_NBR_SHOW_MOST_VIEWED']
+        ) {
+            $errors[] = $this->l('Number of most viewed must be a positive integer.');
+        }
+
+        if (!Validate::isUnsignedInt($configs['DASHPRODUCT_NBR_SHOW_TOP_SEARCH'])
+            || !$configs['DASHPRODUCT_NBR_SHOW_TOP_SEARCH']
+        ) {
+            $errors[] = $this->l('Number of top searches must be a positive integer.');
+        }
+
+        return $errors;
+    }
+
 	public function hookDashboardData($params)
 	{
 		$table_recent_orders = $this->getTableRecentOrders($params['id_hotel']);

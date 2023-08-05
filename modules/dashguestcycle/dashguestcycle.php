@@ -365,7 +365,7 @@ class DashGuestCycle extends Module
                 'class' => 'text-right',
             );
             $tr[] = array(
-                'value' => $newBookingInfo['state_name'],
+                'value' => '<span class="label color_field" style="background-color:'.$newBookingInfo['state_color'].'">'.$newBookingInfo['state_name'].'</span>',
                 'class' => 'text-left',
             );
 
