@@ -317,8 +317,15 @@ class Dashactivity extends Module
         $referers = $this->getReferer($date_from, $date_to);
         $return = array('chart_type' => 'pie_chart_trends', 'data' => array());
         $i = 0;
+
+        $totalTraffic = array_sum(array_values($referers));
         foreach ($referers as $referer_name => $n) {
-            $return['data'][] = array('key' => $referer_name, 'y' => $n, 'color' => self::$colors[$i++]);
+            $return['data'][] = array(
+                'key' => $referer_name,
+                'y' => $n,
+                'color' => self::$colors[$i++],
+                'percent' => $n ? (Tools::ps_round($n / $totalTraffic * 100, 2)) : 0,
+            );
         }
 
         return $return;

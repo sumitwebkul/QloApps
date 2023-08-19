@@ -36,6 +36,12 @@ function pie_chart_trends(widget_name, chart_details)
 			.showLegend(false)
 			.donutRatio(0.4);
 
+        // create content for the tooltip of chart
+        chart.tooltip.contentGenerator((obj, element) => {
+            var tooltipContent = '<p><b>' + obj.data.y + '</b> (' + obj.data.percent + ' %)</p>';
+            return getTooltipContent(obj.data.key, tooltipContent, obj.color);
+        });
+
 		d3.select("#dash_traffic_chart2 svg")
 			.datum(chart_details.data)
 			.transition().duration(1200)

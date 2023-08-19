@@ -86,11 +86,6 @@
 		<div id="dash_trends_chart1" class="chart with-transitions">
 			<svg></svg>
 		</div>
-		<div class="col-sm-12 ">
-			<p id="no-chart-info" class="alert alert-info no-chart-info">
-				{l s='The graph is unavailable when selecting this date range. Select another date range for the graph.' mod='dashtrends'}
-			</p>
-		</div>
 		<div class='clearfix'></div>
 	</section>
 </div>

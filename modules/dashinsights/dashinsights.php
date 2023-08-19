@@ -54,6 +54,14 @@ class DashInsights extends Module
     public function hookActionAdminControllerSetMedia()
     {
         if (Tools::getValue('controller') == 'AdminDashboard') {
+            Media::addJsDef(array(
+                'hotel_txt' => $this->l('Hotel'),
+                'room_occupied_txt' => $this->l('Room Occupied'),
+                'length_of_stay_txt' => $this->l('Length Of Stay'),
+                'total_nights_booked_txt' => $this->l('Total Nights Booked'),
+                'date_txt' => $this->l('Date'),
+            ));
+
             $this->context->controller->addCSS($this->_path.'views/css/'.$this->name.'.css');
             $this->context->controller->addJS($this->_path.'views/js/'.$this->name.'.js');
         }
@@ -133,13 +141,13 @@ class DashInsights extends Module
                     'chart_type' => 'multibar_chart_dotw_dashinsights',
                     'data' => $daysOfTheWeekData,
                     'date_format' => $this->context->language->date_format_lite,
+                    'axis_labels' => array('y' => $this->l('Rooms occupied')),
                 ),
                 'dashinsights_multibar_chart2' => array(
-                    'chart_type' => 'multibar_chart_los_dashinsights',
+                'chart_type' => 'multibar_chart_los_dashinsights',
                     'data' => $lengthOfStayData,
                     'date_format' => $this->context->language->date_format_lite,
-                    'axis_labels' => array('x' => $this->l('Days')),
-                    'y_format' => '%',
+                    'axis_labels' => array('x' => $this->l('Length of stay'), 'y' => $this->l('Rooms occupied')),
                 ),
             ),
         );
@@ -336,7 +344,7 @@ class DashInsights extends Module
                     $averageDaysOfTheWeekData = AdminStatsController::getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo, $idsHotel, true, true);
                     $averageSeriesInfo = array(
                         'data' => $averageDaysOfTheWeekData,
-                        'label' => $this->l('Others Average'),
+                        'label' => $this->l('Other Hotels Average'),
                     );
 
                     $seriesWiseDaysOfTheWeek[] = $averageSeriesInfo;
@@ -348,21 +356,25 @@ class DashInsights extends Module
         $daysOfTheWeekFormattedData = array();
         $colorIndex = 0;
         $weekDays = array(
-            $this->l('SUN'),
-            $this->l('MON'),
-            $this->l('TUE'),
-            $this->l('WED'),
-            $this->l('THU'),
-            $this->l('FRI'),
-            $this->l('SAT'),
+            array('key' => $this->l('Sun'), 'name' => $this->l('Sunday')),
+            array('key' => $this->l('Mon'), 'name' => $this->l('Monday')),
+            array('key' => $this->l('Tue'), 'name' => $this->l('Tuesday')),
+            array('key' => $this->l('Wed'), 'name' => $this->l('Wednesday')),
+            array('key' => $this->l('Thu'), 'name' => $this->l('Thrusday')),
+            array('key' => $this->l('Fri'), 'name' => $this->l('Friday')),
+            array('key' => $this->l('Sat'), 'name' => $this->l('Saturday'))
         );
+
 
         foreach ($seriesWiseDaysOfTheWeek as $key => &$hotelDaysOfTheWeek) {
             $hotelData = array();
+            $totalBookedRooms = array_sum(array_values($hotelDaysOfTheWeek['data']));
             foreach ($hotelDaysOfTheWeek['data'] as $dayOfWeek => $hotelDayOfTheWeek) {
                 $hotelData[] = array(
-                    'x' => $weekDays[$dayOfWeek - 1],
+                    'day' => $weekDays[$dayOfWeek - 1]['name'],
+                    'x' => $weekDays[$dayOfWeek - 1]['key'],
                     'y' => $hotelDayOfTheWeek,
+                    'percent' => $hotelDayOfTheWeek ? (Tools::ps_round($hotelDayOfTheWeek / $totalBookedRooms * 100, 2)) : 0,
                 );
             }
 
@@ -382,13 +394,13 @@ class DashInsights extends Module
 
         // day ranges to get length of stay data
         $day = array(
-            1 => array(1, 1),
-            2 => array(2, 2),
-            3 => array(3, 3),
-            4 => array(4, 4),
-            5 => array(5, 5),
-            6 => array(6, 6),
             7 => array(7, 100),
+            6 => array(6, 6),
+            5 => array(5, 5),
+            4 => array(4, 4),
+            3 => array(3, 3),
+            2 => array(2, 2),
+            1 => array(1, 1),
         );
 
         if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
@@ -440,7 +452,7 @@ class DashInsights extends Module
             if ($idHotel == 0) { // if 'All Hotels' is selected
                 $idsHotel = $this->accessibleIdsHotel;
                 $allHotelSeriesInfo = array(
-                    'data' => AdminStatsController::getLengthOfStayPercentages($day, $dateFrom, $dateTo, $idsHotel),
+                    'data' => AdminStatsController::getLengthOfStayInfo($day, $dateFrom, $dateTo, $idsHotel),
                     'label' => $this->l('All Hotels'),
                 );
 
@@ -450,7 +462,7 @@ class DashInsights extends Module
                 $otherHotelsLengthOfStay = array();
 
                 $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
-                $currentHotelLengthOfStayData = AdminStatsController::getLengthOfStayPercentages($day, $dateFrom, $dateTo, $idHotel);
+                $currentHotelLengthOfStayData = AdminStatsController::getLengthOfStayInfo($day, $dateFrom, $dateTo, $idHotel);
 
                 $currentHotelSeriesInfo = array(
                     'data' => $currentHotelLengthOfStayData,
@@ -466,7 +478,7 @@ class DashInsights extends Module
                 }
 
                 if (count($idsHotel) > 0) { // display average series only if other hotels are available
-                    $averageLengthOfStayData = AdminStatsController::getLengthOfStayPercentages($day, $dateFrom, $dateTo, $idsHotel, true, true);
+                    $averageLengthOfStayData = AdminStatsController::getLengthOfStayInfo($day, $dateFrom, $dateTo, $idsHotel, true, true);
                     $averageSeriesInfo = array(
                         'data' => $averageLengthOfStayData,
                         'label' => $this->l('Others Average'),
@@ -492,10 +504,12 @@ class DashInsights extends Module
 
         foreach ($seriesWiseLengthOfStay as $idHotel => &$hotelLengthOfStay) {
             $hotelData = array();
-            foreach ($hotelLengthOfStay['data'] as $numDays => $lengthOfStay) {
+            foreach ($hotelLengthOfStay['data'] as $numDays => $lengthOfStayInfo) {
                 $hotelData[] = array(
                     'x' => $losInfos[$numDays - 1]['label'],
-                    'y' => $lengthOfStay,
+                    'percent' => Tools::ps_round($lengthOfStayInfo['percent'], 2),
+                    'y' => $lengthOfStayInfo['rooms_occupied'],
+                    'rooms_occupied' => $lengthOfStayInfo['rooms_occupied'],
                 );
             }
 

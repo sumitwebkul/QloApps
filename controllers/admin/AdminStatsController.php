@@ -492,9 +492,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
 			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1
 			'.Shop::addSqlRestriction(false, 'o').'
 			GROUP BY LEFT(`invoice_date`, 10)');
+
             foreach ($result as $row) {
                 $purchases[strtotime($row['date'])] = $row['total_purchase_price'];
             }
+
             return $purchases;
         } else {
             return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
@@ -555,6 +557,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 $expenses += $flat_fees + $var_fees;
             }
         }
+
         return $expenses;
     }
 
@@ -1023,7 +1026,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             ($occupiedRooms ? ' AND hri.`id` NOT IN ('.implode(',', $occupiedRooms).')' : '').
             ' AND ("'.pSQL($dateTo).'" > hrdd.`date_from` AND "'.pSQL($dateFrom).'" < hrdd.`date_to`)
             AND p.`active` = 1'.
-            (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '')
+            (!is_null($idsHotel) ? HotelBranchInformation::addHotelRestriction($idsHotel, 'hri') : '')
         );
         $occupancyData['count_unavailable'] += $countDisabled;
 
@@ -1148,15 +1151,13 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getRecentOrdersByHotel($idHotel = null, $limit = null)
     {
+        $idLang = Context::getContext()->language->id;
         return Db::getInstance()->executeS(
-            'SELECT *, (
-                SELECT osl.`name`
-                FROM `'._DB_PREFIX_.'order_state_lang` osl
-                WHERE osl.`id_order_state` = o.`current_state`
-                AND osl.`id_lang` = '.(int) Context::getContext()->language->id.'
-                LIMIT 1
-            ) AS `state_name`, o.`date_add` AS `date_add`, o.`date_upd` AS `date_upd`
+            'SELECT *, osl.`name` AS `state_name`, os.`color` AS `state_color`, o.`date_add` AS `date_add`, o.`date_upd` AS `date_upd`
             FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.`current_state` = os.`id_order_state`)
+            LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl
+            ON (osl.`id_order_state` = o.`current_state` AND osl.`id_lang` = '.(int) $idLang.')
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
             LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
             WHERE 1'.HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
@@ -1220,7 +1221,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     {
         $sql = 'SELECT hbd.`id_customer`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name, COUNT(hbd.`id`) AS total_rooms,
         SUM(hbd.`adults` + hbd.`children`) AS total_guests, hbd.`id_hotel`, hbd.`hotel_name`, hbd.`id_order`, o.`with_occupancy`,
-        o.`total_paid_tax_excl`, o.`id_currency`, osl.`name` AS `state_name`, os.`color` as `state_color`
+        o.`total_paid_tax_excl`, o.`id_currency`, osl.`name` AS `state_name`, os.`color` AS `state_color`
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
         LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.`current_state` = os.`id_order_state`)
@@ -1930,7 +1931,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result;
     }
 
-    public static function getLengthOfStayPercentages($days, $dateFrom, $dateTo, $idHotel = null, $useCache = true, $average = false)
+    public static function getLengthOfStayInfo($days, $dateFrom, $dateTo, $idHotel = null, $useCache = true)
     {
         $idsHotel = array();
         if (is_int($idHotel)) {
@@ -1969,18 +1970,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
             }
         }
 
-        // calculate averages
-        if ($average) {
-            $totalHotels = count($idsHotel);
-            if ($totalHotels > 1) {
-                foreach ($result as $key => $ratio) {
-                    $result[$key] = $ratio['total'] ? ($ratio['fraction'] / $ratio['total']) : 0;
-                }
-            }
-        } else {
-            foreach ($result as $key => $ratio) {
-                $result[$key] = $ratio['total'] ? ($ratio['fraction'] / $ratio['total']) : 0;
-            }
+        foreach ($result as $key => $ratio) {
+            $result[$key] = array(
+                'rooms_occupied' => $ratio['fraction'],
+                'percent' => $ratio['total'] ? ($ratio['fraction'] / $ratio['total'] * 100) : 0
+            );
         }
 
         return $result;

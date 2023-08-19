@@ -201,7 +201,7 @@ class DashProducts extends Module
 			);
 			$tr[] = array(
 				'id' => 'status',
-				'value' => Tools::htmlentitiesUTF8($order['state_name']),
+                'value' => '<span class="label color_field" style="background-color:'.$order['state_color'].'">'.Tools::htmlentitiesUTF8($order['state_name']).'</span>',
 				'class' => 'text-left',
 			);
 			$tr[] = array(
