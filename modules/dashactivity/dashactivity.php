@@ -140,9 +140,24 @@ class Dashactivity extends Module
                     'dash_trends_chart1' => array(
                         'chart_type' => 'pie_chart_trends',
                         'data' => array(
-                            array('key' => 'qloapps.com', 'y' => round($visits / 2), 'color' => self::$colors[0]),
-                            array('key' => 'google.com', 'y' => round($visits / 3), 'color' => self::$colors[1]),
-                            array('key' => 'Direct Traffic', 'y' => round($visits / 4), 'color' => self::$colors[2])
+                            array(
+                                'key' => 'qloapps.com',
+                                'y' => round($visits / 2),
+                                'color' => self::$colors[0],
+                                'percent' => ($visits / 2) ? (Tools::ps_round((100 / 2), 2)) : 0,
+                            ),
+                            array(
+                                'key' => 'google.com',
+                                'y' => round($visits / 3),
+                                'color' => self::$colors[1],
+                                'percent' => ($visits / 3) ? (Tools::ps_round((100 / 3), 2)) : 0,
+                            ),
+                            array(
+                                'key' => 'Direct Traffic',
+                                'y' => round($visits / 4),
+                                'color' => self::$colors[2],
+                                'percent' => ($visits / 4) ? (Tools::ps_round((100 / 4), 2)) : 0,
+                            )
                         )
                     )
                 )

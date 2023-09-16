@@ -11,7 +11,8 @@ function line_chart_trends(widget_name, chart_details)
             var chart = nv.models.lineChart()
                 .useInteractiveGuideline(true)
                 .x(function(d) { return (d !== undefined ? d[0] : 0); })
-                .y(function(d) { return (d !== undefined ? parseInt(d[1]) : 0); })
+                .y(function(d) { return (d !== undefined ? parseFloat(d[1]) : 0); })
+                .forceY([0, 50])
                 .margin({
                     left: 70,
                     right: 30,
@@ -98,17 +99,26 @@ function selectDashtrendsChart(element, type)
 		}
 	});
 
-	dashtrends_chart.yAxis.tickFormat(d3.format('.f'));
+    if (type == 'orders' || type == 'visits') {
+        dashtrends_chart.yAxis.tickFormat(d3.format('d'));
+        dashtrends_chart.forceY([0, 1]);
+    } else {
+        dashtrends_chart.yAxis.tickFormat(d3.format('.f'));
+    }
 
-	if (type == 'sales' || type == 'average_cart_value' || type == 'net_profits')
+	if (type == 'sales' || type == 'average_cart_value' || type == 'net_profits') {
+        dashtrends_chart.forceY([0, 50]);
 		dashtrends_chart.yAxis.tickFormat(function(d) {
 			return formatCurrency(parseFloat(d), currency_format, currency_sign, currency_blank);
 		});
+    }
 
-	if (type == 'conversion_rate')
+	if (type == 'conversion_rate') {
+        dashtrends_chart.forceY([0, 10]);
 		dashtrends_chart.yAxis.tickFormat(function(d) {
-			return d3.round(d*100, 2)+' %';
+			return d3.round(d, 2)+' %';
 		});
+    }
 
     // create content for the tooltip of chart for different charts dynamically
     dashtrends_chart.interactiveLayer.tooltip.contentGenerator((obj, element) => {
@@ -119,7 +129,7 @@ function selectDashtrendsChart(element, type)
             if (type == 'sales' || type == 'average_cart_value' || type == 'net_profits') {
                 var trendValue = formatCurrency(parseFloat(obj.series[0].value), currency_format, currency_sign, currency_blank)
             } else if (type == 'conversion_rate') {
-                var trendValue = d3.round(obj.series[0].value*100, 2)+'%';
+                var trendValue = d3.round(obj.series[0]['data'][1], 2)+'%';
             } else {
                 var trendValue = obj.series[0].value;
             }

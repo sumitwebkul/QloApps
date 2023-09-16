@@ -411,33 +411,66 @@ class DashInsights extends Module
                     'label' => $this->l('All Hotels'),
                 );
 
-                for ($i = 1; $i <= 7; $i++) {
-                    $allHotelSeriesInfo['data'][$i] = sprintf('%0.2f', rand(1, 100) / 100);
+                $roomsOccupied = array(
+                    7 => rand(1, 100),
+                    6 => rand(1, 100),
+                    5 => rand(1, 100),
+                    4 => rand(1, 100),
+                    3 => rand(1, 100),
+                    2 => rand(1, 100),
+                    1 => rand(1, 100),
+                );
+                $totalOccupiedRooms = array_sum($roomsOccupied);
+                foreach ($roomsOccupied as $key => $value) {
+                    $allHotelSeriesInfo['data'][$key]['rooms_occupied'] = $value;
+                    $allHotelSeriesInfo['data'][$key]['percent'] = Tools::ps_round(($value / $totalOccupiedRooms * 100), 2);
                 }
 
                 $seriesWiseLengthOfStay[] = $allHotelSeriesInfo;
             } else { // if one of the hotels is selected
-                $hotelLengthOfStay = array();
-                $otherHotelsLengthOfStay = array();
+                // calculation for currently selected hotel
+                $roomsOccupied = array(
+                    7 => rand(1, 100),
+                    6 => rand(1, 100),
+                    5 => rand(1, 100),
+                    4 => rand(1, 100),
+                    3 => rand(1, 100),
+                    2 => rand(1, 100),
+                    1 => rand(1, 100),
+                );
 
-                // current hotel series info
-                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
+                $totalOccupiedRooms = array_sum($roomsOccupied);
                 $currentHotelLengthOfStayData = array();
-                for ($i = 1; $i <= 7; $i++) {
-                    $currentHotelLengthOfStayData[$i] = sprintf('%0.2f', rand(1, 100) / 100);
+                foreach ($roomsOccupied as $key => $value) {
+                    $currentHotelLengthOfStayData[$key]['rooms_occupied'] = $value;
+                    $currentHotelLengthOfStayData[$key]['percent'] = Tools::ps_round(($value / $totalOccupiedRooms * 100), 2);
                 }
 
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                 $currentHotelSeriesInfo = array(
                     'data' => $currentHotelLengthOfStayData,
                     'label' => $objHotelBranchInformation->hotel_name,
                 );
 
-                // average series info
+                // calculation for other hotels average series info
+                $roomsOccupied = array(
+                    7 => rand(1, 100),
+                    6 => rand(1, 100),
+                    5 => rand(1, 100),
+                    4 => rand(1, 100),
+                    3 => rand(1, 100),
+                    2 => rand(1, 100),
+                    1 => rand(1, 100),
+                );
+
+                $totalOccupiedRooms = array_sum($roomsOccupied);
                 $averageLengthOfStayData = array();
-                for ($i = 1; $i <= 7; $i++) {
-                    $averageLengthOfStayData[$i] = sprintf('%0.2f', rand(1, 100) / 100);
+                foreach ($roomsOccupied as $key => $value) {
+                    $averageLengthOfStayData[$key]['rooms_occupied'] = $value;
+                    $averageLengthOfStayData[$key]['percent'] = Tools::ps_round(($value / $totalOccupiedRooms * 100), 2);
                 }
 
+                $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                 $averageSeriesInfo = array(
                     'data' => $averageLengthOfStayData,
                     'label' => $this->l('Others Average'),
@@ -458,7 +491,6 @@ class DashInsights extends Module
 
                 $seriesWiseLengthOfStay[] = $allHotelSeriesInfo;
             } else { // if one of the hotels is selected
-                $hotelLengthOfStay = array();
                 $otherHotelsLengthOfStay = array();
 
                 $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);

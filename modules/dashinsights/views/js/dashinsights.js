@@ -60,6 +60,22 @@ function line_chart_dashinsights(widget_name, chart_details) {
         chart.xAxis.tickFormat(function (d) {
             date = new Date(d * 1000);
             return date.format(chart_details['date_format']);
+        })
+        // through this function we are also fixing the x axis date and values alignment issue
+        .tickValues(function(values) {
+            var indexInterval = Math.floor(values[0].values.length / 10);
+
+            var dates = [];
+            for (var i = 0; i < 10; i++) {
+                if (values[0].values[(indexInterval+1) * i]) {
+                    dates.push(values[0].values[(indexInterval+1) * i]);
+                }
+            }
+            var dates =  dates.map(function(v) {
+                return v[0]
+            });
+
+            return dates;
         });
 
         // Y axis values must be integer only

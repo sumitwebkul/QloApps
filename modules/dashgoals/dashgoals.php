@@ -257,7 +257,7 @@ class Dashgoals extends Module
                     $monthGoalInfo['complete'] = 1;
                 }
                 $goal_diff = abs($goal_diff);
-                $monthGoalInfo['value_type'] = self::DGT_VALUE_TYPE_TEXT;
+                $monthGoalInfo['value_type'] = self::DG_VALUE_TYPE_TEXT;
                 $monthGoalInfo['value'] = Tools::ps_round($value, 2);
                 $monthGoalInfo['goal'] = Tools::ps_round($month_goal, 2);
                 $monthGoalInfo['goal_diff'] = Tools::ps_round($goal_diff, 2);

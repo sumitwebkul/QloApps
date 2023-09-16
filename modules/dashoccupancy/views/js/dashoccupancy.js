@@ -52,12 +52,20 @@ $(document).ready(function() {
         start = Date.parseDate($('#date-start').val(), 'Y-m-d');
         end = Date.parseDate($('#date-end').val(), 'Y-m-d');
 
+        if (end.getDate() == start.getDate()) {
+            end.setDate(end.getDate() + 1);
+        }
+
         $('#dashoccupancy_date_range').html(sprintf(date_subtitle, start.format(date_format), end.format(date_format)));
     });
 
     $('#date-end').change(function() {
         start = Date.parseDate($('#date-start').val(), 'Y-m-d');
         end = Date.parseDate($('#date-end').val(), 'Y-m-d');
+
+        if (end.getDate() == start.getDate()) {
+            end.setDate(end.getDate() + 1);
+        }
 
         $('#dashoccupancy_date_range').html(sprintf(date_subtitle, start.format(date_format), end.format(date_format)));
     });

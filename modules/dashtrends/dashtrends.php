@@ -147,8 +147,7 @@ class Dashtrends extends Module
             $refined_data['orders'][$date] = isset($gross_data['orders'][$date]) ? $gross_data['orders'][$date] : 0;
             $refined_data['average_cart_value'][$date] = $refined_data['orders'][$date] ? $refined_data['sales'][$date] / $refined_data['orders'][$date] : 0;
             $refined_data['visits'][$date] = isset($gross_data['visits'][$date]) ? $gross_data['visits'][$date] : 0;
-            $refined_data['conversion_rate'][$date] = $refined_data['visits'][$date] ? $refined_data['orders'][$date] / $refined_data['visits'][$date] : 0;
-
+            $refined_data['conversion_rate'][$date] = $refined_data['visits'][$date] ? ($refined_data['orders'][$date] / $refined_data['visits'][$date] * 100) : 0;
             $refined_data['net_profits'][$date] += (isset($gross_data['total_paid_tax_excl'][$date]) ? $gross_data['total_paid_tax_excl'][$date] : 0);
             $refined_data['net_profits'][$date] -= (isset($gross_data['total_purchases'][$date]) ? $gross_data['total_purchases'][$date] : 0);
             $refined_data['net_profits'][$date] -= (isset($gross_data['total_expenses'][$date]) ? $gross_data['total_expenses'][$date] : 0);
@@ -315,7 +314,7 @@ class Dashtrends extends Module
 
         $charts = array(
             'sales' => $this->l('Sales'),
-            'orders' => $this->l('Bookings'),
+            'orders' => $this->l('Orders'),
             'average_cart_value' => $this->l('Average Order Value'),
             'visits' => $this->l('Visits'),
             'conversion_rate' => $this->l('Conversion Rate'),

@@ -217,13 +217,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
         if ($granularity == 'day') {
             $sales = array();
             $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS(
-                'SELECT LEFT(`invoice_date`, 10) AS date, SUM(total_paid_tax_excl / o.conversion_rate) AS sales,
+                'SELECT LEFT(`invoice_date`, 10) AS date, IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), SUM(total_paid_tax_excl), SUM(total_paid_tax_excl / cu.`conversion_rate`)) AS sales,
                 (
                     SELECT hbd.`id_hotel`
                     FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
                     WHERE hbd.`id_order` = o.`id_order` LIMIT 1
                 ) AS id_hotel
                 FROM `'._DB_PREFIX_.'orders` o
+                LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
                 WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1
                 GROUP BY LEFT(`invoice_date`, 10)
@@ -238,13 +239,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
         } elseif ($granularity == 'month') {
             $sales = array();
             $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS(
-                'SELECT LEFT(`invoice_date`, 7) AS date, SUM(total_paid_tax_excl / o.conversion_rate) AS sales,
+                'SELECT LEFT(`invoice_date`, 7) AS date, IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), SUM(total_paid_tax_excl), SUM(total_paid_tax_excl / cu.`conversion_rate`)) AS sales,
                 (
                     SELECT hbd.`id_hotel`
                     FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
                     WHERE hbd.`id_order` = o.`id_order` LIMIT 1
                 ) AS id_hotel
                 FROM `'._DB_PREFIX_.'orders` o
+                LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
                 WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1
                 GROUP BY LEFT(`invoice_date`, 7)
@@ -258,13 +260,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
             return $sales;
         } else {
             return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-                'SELECT SUM(total_paid_tax_excl / o.conversion_rate),
+                'SELECT IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), SUM(total_paid_tax_excl), SUM(total_paid_tax_excl / cu.`conversion_rate`)) AS sales,
                 (
                     SELECT hbd.`id_hotel`
                     FROM`'._DB_PREFIX_.'htl_booking_detail` hbd
                     WHERE hbd.`id_order` = o.`id_order` LIMIT 1
                 ) AS id_hotel
                 FROM `'._DB_PREFIX_.'orders` o
+                LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
                 WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1
                 HAVING 1 '.HotelBranchInformation::addHotelRestriction($id_hotel)
@@ -369,6 +372,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return array('type' => 'neutral', 'value' => round(100 * $row['neutral'] / $row['total']));
     }
 
+    // @todo price conversion for admin selected currency is to be corrected
     public static function getBestCategory($date_from, $date_to)
     {
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
@@ -391,7 +395,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 		) t	ON t.`id_product` = capr.`id_product`
         RIGHT JOIN `'._DB_PREFIX_.'category` c2
         ON c2.`id_category` = '.(int)Configuration::get('PS_SERVICE_CATEGORY').' AND ca.`nleft` >= c2.`nleft` AND ca.`nright` <= c2.`nright`
-		WHERE ca.`level_depth` > 1
+		WHERE ca.`level_depth` > 2
 		GROUP BY ca.`id_category`
 		ORDER BY SUM(t.`totalPriceSold`) DESC');
     }
@@ -482,11 +486,12 @@ class AdminStatsControllerCore extends AdminStatsTabController
 			SELECT
 				LEFT(`invoice_date`, 10) as date,
 				SUM(od.`product_quantity` * IF(
-					od.`purchase_supplier_price` > 0,
-					od.`purchase_supplier_price` / `conversion_rate`,
-					od.`original_product_price` * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
-				)) as total_purchase_price
+                    od.`purchase_supplier_price` > 0,
+                    (IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), od.`purchase_supplier_price`, (od.`purchase_supplier_price` / cu.`conversion_rate`))),
+                    (IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), od.`original_product_price`, (od.`original_product_price` / cu.`conversion_rate`))) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
+                )) as total_purchase_price
 			FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
 			LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
 			LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
 			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1
@@ -502,10 +507,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
             return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
 			SELECT SUM(od.`product_quantity` * IF(
 				od.`purchase_supplier_price` > 0,
-				od.`purchase_supplier_price` / `conversion_rate`,
-				od.`original_product_price` * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
+                (IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), od.`purchase_supplier_price`, (od.`purchase_supplier_price` / cu.`conversion_rate`))),
+                (IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), od.`original_product_price`, (od.`original_product_price` / cu.`conversion_rate`))) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
 			)) as total_purchase_price
 			FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
 			LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
 			LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
 			WHERE `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59" AND os.logable = 1
@@ -520,13 +526,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $orders = Db::getInstance()->ExecuteS('
 		SELECT
 			LEFT(`invoice_date`, 10) as date,
-			total_paid_tax_incl / o.conversion_rate as total_paid_tax_incl,
-			total_shipping_tax_excl / o.conversion_rate as total_shipping_tax_excl,
+            IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), total_paid_tax_incl, (total_paid_tax_incl / cu.`conversion_rate`)) AS total_paid_tax_incl,
+            IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), total_shipping_tax_excl, (total_shipping_tax_excl / cu.`conversion_rate`)) AS total_shipping_tax_excl,
 			o.module,
 			hbd.id_country,
 			o.id_currency,
 			c.id_reference as carrier_reference
 		FROM `'._DB_PREFIX_.'orders` o
+        LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
 		LEFT JOIN `'._DB_PREFIX_.'address` hbd ON o.id_address_delivery = hbd.id_address
 		LEFT JOIN `'._DB_PREFIX_.'carrier` c ON o.id_carrier = c.id_carrier
 		LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
@@ -769,11 +776,13 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 $row = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
                 SELECT
                     COUNT(o.`id_order`) as orders,
-                    SUM(o.`total_paid_tax_excl` / o.`conversion_rate`) as total_paid_tax_excl
+                    IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), SUM(o.`total_paid_tax_excl`), SUM(o.`total_paid_tax_excl` / cu.`conversion_rate`)) AS total_paid_tax_excl
                 FROM `'._DB_PREFIX_.'orders` o
+                LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON os.`id_order_state` = o.`current_state`
                 WHERE o.`invoice_date` BETWEEN "'.pSQL(date('Y-m-d', strtotime('-31 day'))).' 00:00:00" AND "'.pSQL(date('Y-m-d', strtotime('-1 day'))).' 23:59:59" AND os.`logable` = 1
                 '.Shop::addSqlRestriction());
+
                 $value = Tools::displayPrice($row['orders'] ? $row['total_paid_tax_excl'] / $row['orders'] : 0, $currency);
                 break;
 
@@ -803,7 +812,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 break;
 
             case 'top_category':
-                if (!($id_category = AdminStatsController::getBestCategory(date('Y-m-d', strtotime('-1 month')), date('Y-m-d')))) {
+                if (!($id_category = AdminStatsController::getBestCategory(date('Y-m-d', strtotime('-1 month')), date('Y-m-d', strtotime('+1 month'))))) {
                     $value = $this->l('No category', null, null, false);
                 } else {
                     $category = new Category($id_category, $this->context->language->id);
@@ -1111,11 +1120,12 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getRevenue($dateFrom, $dateTo, $idHotel = false, $orderSource = '')
     {
-        $sql = 'SELECT SUM(total_paid_tax_excl - refunded_amount) FROM (
-            SELECT o.`total_paid_tax_excl` / o.`conversion_rate` AS total_paid_tax_excl,
-            IFNULL(orr.`refunded_amount`, 0) AS refunded_amount,
+        $sql = 'SELECT SUM(`total_paid_tax_excl` - `refunded_amount`) FROM (
+            SELECT IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), o.`total_paid_tax_excl`, (o.`total_paid_tax_excl` / cu.`conversion_rate`)) as total_paid_tax_excl,
+            IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), IFNULL(orr.`refunded_amount`, 0), (IFNULL(orr.`refunded_amount`, 0) / cu.`conversion_rate`)) as refunded_amount,
             (SELECT hbd.`id_hotel` FROM`'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = o.`id_order` LIMIT 1) AS id_hotel
             FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
             LEFT JOIN `' ._DB_PREFIX_.'order_return` orr ON orr.`id_order` = o.`id_order`
             WHERE o.`valid` = 1 AND o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"';
 
@@ -1123,7 +1133,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $sql .= ' AND o.`source` = "'.pSQL($orderSource).'"';
         }
 
-        $sql .= 'HAVING 1 '.HotelBranchInformation::addHotelRestriction($idHotel).') AS t';
+        $sql .= ' HAVING 1 '.HotelBranchInformation::addHotelRestriction($idHotel).') as t';
 
         $result = Db::getInstance()->getValue($sql);
 
@@ -1335,10 +1345,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $cacheKey = 'AdminStats::getRoomsRevenueForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
             (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
             if (!Cache::isStored($cacheKey) || !$useCache) {
-                $sql = 'SELECT IFNULL(SUM(hbd.`total_price_tax_excl` / DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0)
+                $sql = 'SELECT IFNULL(IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), SUM(hbd.`total_price_tax_excl` / DATEDIFF(hbd.`date_to`, hbd.`date_from`)), SUM((hbd.`total_price_tax_excl` / DATEDIFF(hbd.`date_to`, hbd.`date_from`)) / cu.`conversion_rate`)), 0)
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
                 LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+                LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
                 WHERE p.`active` = 1
                 AND o.`valid` = 1
                 AND hbd.`is_refunded` = 0
@@ -1379,12 +1390,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 $sql = 'SELECT SUM((current_parts / total_parts) * total_paid_tax_excl) AS total_revenue
                 FROM (
                     SELECT o.`id_order`,
-                    o.`total_paid_tax_excl` / o.`conversion_rate` AS total_paid_tax_excl,
+                    IF((o.`id_currency` = '.Configuration::get('PS_CURRENCY_DEFAULT').'), o.`total_paid_tax_excl`, (o.`total_paid_tax_excl` / cu.`conversion_rate`)) as total_paid_tax_excl,
                     (
                         SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`))
                         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                        INNER JOIN `'._DB_PREFIX_.'product` p
-                        ON (p.`id_product` = hbd.`id_product`)
+                        INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
                         WHERE hbd.`id_order` = o.`id_order`
                         AND p.`active` = 1 AND hbd.`is_refunded` = 0 AND o.`valid` = 1'.
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
@@ -1392,14 +1402,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     (
                         SELECT COUNT(*)
                         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                        INNER JOIN `'._DB_PREFIX_.'product` p
-                        ON (p.`id_product` = hbd.`id_product`)
+                        INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
                         WHERE hbd.`id_order` = o.`id_order`
                         AND hbd.`date_from` <= "'.pSQL($discreteDate['date_from']).' 00:00:00" AND hbd.`date_to` >= "'.pSQL($discreteDate['date_to']).' 00:00:00"
                         AND p.`active` = 1 AND hbd.`is_refunded` = 0 AND o.`valid` = 1'.
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
                     ) AS current_parts
                     FROM `'._DB_PREFIX_.'orders` o
+                    LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
                     HAVING total_parts IS NOT NULL AND current_parts > 0
                     ORDER BY o.`id_order`
                 ) AS t';
@@ -1821,7 +1831,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 DATEDIFF(hbd.`date_to`, hbd.`date_from`) % 7 AS remaining_days
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`is_refunded` = 0
-                AND hbd.`date_from` < "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+                AND hbd.`date_from` <= "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
                 (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
             ) AS t';
 
@@ -1892,17 +1902,13 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $cacheKey = 'AdminStats::getLengthOfStayRatio'.'_'.(int) $losMinimum.(int) $losMaximum.
         (int) strtotime($dateFrom).(int) strtotime($dateTo).(!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
         if (!Cache::isStored($cacheKey) || !$useCache) {
-            if ($dateFrom == $dateTo) {
-                $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
-            }
-
             $sql = 'SELECT COUNT(hbd.`id`) AS total
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'product` p
             ON (p.`id_product` = hbd.`id_product`)
             WHERE p.`active` = 1
             AND hbd.`is_refunded` = 0
-            AND hbd.`date_from` < "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+            AND hbd.`date_from` <= "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
             (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
 
             $total = Db::getInstance()->getValue($sql);
@@ -1915,7 +1921,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 ON (p.`id_product` = hbd.`id_product`)
                 WHERE p.`active` = 1
                 AND hbd.`is_refunded` = 0
-                AND hbd.`date_from` < "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+                AND hbd.`date_from` <= "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
                 (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
             ) AS t
             WHERE los >= '.(int) $losMinimum.' AND los <= '.(int) ($losMaximum ? $losMaximum : $losMinimum);
