@@ -335,6 +335,15 @@
 	<configuration id="PS_GUEST_CHECKOUT_ENABLED" name="PS_GUEST_CHECKOUT_ENABLED">
 		<value>0</value>
 	</configuration>
+    <configuration id="PS_ORDER_KPI_DAYS_FOR_CONVERSION_RATE" name="PS_ORDER_KPI_DAYS_FOR_CONVERSION_RATE">
+		<value>30</value>
+	</configuration>
+    <configuration id="PS_ORDER_KPI_DAYS_FOR_AVG_ORDER_VALUE" name="PS_ORDER_KPI_DAYS_FOR_AVG_ORDER_VALUE">
+		<value>30</value>
+	</configuration>
+    <configuration id="PS_ORDER_KPI_DAYS_FOR_PER_VISITOR_PROFIT" name="PS_ORDER_KPI_DAYS_FOR_PER_VISITOR_PROFIT">
+		<value>30</value>
+	</configuration>
 	<configuration id="PS_ORDER_CONF_MAIL_TO_CUSTOMER" name="PS_ORDER_CONF_MAIL_TO_CUSTOMER">
 		<value>1</value>
 	</configuration>

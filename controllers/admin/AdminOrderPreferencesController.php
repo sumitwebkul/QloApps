@@ -159,6 +159,30 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
+                    'PS_ORDER_KPI_DAYS_FOR_CONVERSION_RATE' => array(
+                        'title' => $this->l('Days for Conversion Rate KPI'),
+                        'hint' => $this->l('Set for last how many days, the \'Conversion rate\' in the KPI to be calculated.'),
+                        'type' => 'text',
+                        'validation' => 'isUnsignedInt',
+                        'class' => 'fixed-width-xl',
+                        'suffix' => $this->l('day(s)'),
+                    ),
+                    'PS_ORDER_KPI_DAYS_FOR_AVG_ORDER_VALUE' => array(
+                        'title' => $this->l('Days for Average Order Value KPI'),
+                        'hint' => $this->l('Set for last how many days, the \'Average order value\' in the KPI to be calculated.'),
+                        'type' => 'text',
+                        'validation' => 'isUnsignedInt',
+                        'class' => 'fixed-width-xl',
+                        'suffix' => $this->l('day(s)'),
+                    ),
+                    'PS_ORDER_KPI_DAYS_FOR_PER_VISITOR_PROFIT' => array(
+                        'title' => $this->l('Days for Net Profit Per Visitor KPI'),
+                        'hint' => $this->l('Set for last how many days, the \'Net Profit per Visitor\' in the KPI to be calculated.'),
+                        'type' => 'text',
+                        'validation' => 'isUnsignedInt',
+                        'class' => 'fixed-width-xl',
+                        'suffix' => $this->l('day(s)'),
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),

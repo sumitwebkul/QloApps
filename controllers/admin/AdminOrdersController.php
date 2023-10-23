@@ -1358,56 +1358,104 @@ class AdminOrdersControllerCore extends AdminController
         parent::postProcess();
     }
 
-    // public function renderKpis()
-    // {
-    //     $time = time();
-    //     $kpis = array();
+    public function renderKpis()
+    {
+        $time = time();
+        $kpis = array();
 
-    //     $helper = new HelperKpi();
-    //     $helper->id = 'box-conversion-rate';
-    //     $helper->icon = 'icon-sort-by-attributes-alt';
-    //     //$helper->chart = true;
-    //     $helper->color = 'color1';
-    //     $helper->title = $this->l('Conversion Rate', null, null, false);
-    //     $helper->subtitle = $this->l('30 days', null, null, false);
-    //     if (ConfigurationKPI::get('CONVERSION_RATE_CHART') !== false) {
-    //         $helper->data = ConfigurationKPI::get('CONVERSION_RATE_CHART');
-    //     }
-    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
-    //     $kpis[] = $helper->generate();
+        $helper = new HelperKpi();
+        $helper->id = 'box-total-sales';
+        $helper->icon = 'icon-money';
+        $helper->color = 'color4';
+        $helper->title = $this->l('Total Sales', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_sales';
+        $kpis[] = $helper->generate();
 
-    //     $helper = new HelperKpi();
-    //     $helper->id = 'box-carts';
-    //     $helper->icon = 'icon-shopping-cart';
-    //     $helper->color = 'color2';
-    //     $helper->title = $this->l('Abandoned Carts', null, null, false);
-    //     $helper->subtitle = $this->l('Today', null, null, false);
-    //     $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
-    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
-    //     $kpis[] = $helper->generate();
+        $helper = new HelperKpi();
+        $helper->id = 'box-total-due-amount';
+        $helper->icon = 'icon-money';
+        $helper->color = 'color2';
+        $helper->title = $this->l('Total Due Amount', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_due_amount';
+        $kpis[] = $helper->generate();
 
-    //     $helper = new HelperKpi();
-    //     $helper->id = 'box-average-order';
-    //     $helper->icon = 'icon-money';
-    //     $helper->color = 'color3';
-    //     $helper->title = $this->l('Average Order Value', null, null, false);
-    //     $helper->subtitle = $this->l('30 days', null, null, false);
-    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
-    //     $kpis[] = $helper->generate();
+        $helper = new HelperKpi();
+        $helper->id = 'box-today-arrivals';
+        $helper->icon = 'icon-user';
+        $helper->color = 'color1';
+        $helper->title = $this->l('Arrivals', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_arrivals';
+        $kpis[] = $helper->generate();
 
-    //     $helper = new HelperKpi();
-    //     $helper->id = 'box-net-profit-visit';
-    //     $helper->icon = 'icon-user';
-    //     $helper->color = 'color4';
-    //     $helper->title = $this->l('Net Profit per Visit', null, null, false);
-    //     $helper->subtitle = $this->l('30 days', null, null, false);
-    //     $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=netprofit_visit';
-    //     $kpis[] = $helper->generate();
+        $helper = new HelperKpi();
+        $helper->id = 'box-today-departures';
+        $helper->icon = 'icon-user';
+        $helper->color = 'color2';
+        $helper->title = $this->l('Departures', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_departures';
+        $kpis[] = $helper->generate();
 
-    //     $helper = new HelperKpiRow();
-    //     $helper->kpis = $kpis;
-    //     return $helper->generate();
-    // }
+        $helper = new HelperKpi();
+        $helper->id = 'box-today-stay-over';
+        $helper->icon = 'icon-user';
+        $helper->color = 'color4';
+        $helper->title = $this->l('Stay Overs', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_stay_over';
+        $kpis[] = $helper->generate();
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-carts';
+        $helper->icon = 'icon-shopping-cart';
+        $helper->color = 'color2';
+        $helper->title = $this->l('Abandoned Carts', null, null, false);
+        $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
+        $kpis[] = $helper->generate();
+
+        $daysForConversionRate = Configuration::get('PS_ORDER_KPI_DAYS_FOR_CONVERSION_RATE');
+        $helper = new HelperKpi();
+        $helper->id = 'box-conversion-rate';
+        $helper->icon = 'icon-sort-by-attributes-alt';
+        $helper->color = 'color1';
+        $helper->title = $this->l('Conversion Rate', null, null, false);
+        $helper->subtitle = $daysForConversionRate.' '.$this->l('days', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=conversion_rate';
+        $kpis[] = $helper->generate();
+
+        $daysForAvgOrderVal = Configuration::get('PS_ORDER_KPI_DAYS_FOR_AVG_ORDER_VALUE');
+        $helper = new HelperKpi();
+        $helper->id = 'box-average-order';
+        $helper->icon = 'icon-money';
+        $helper->color = 'color3';
+        $helper->title = $this->l('Average Order Value', null, null, false);
+        $helper->subtitle = $daysForAvgOrderVal.' '.$this->l('days', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_order_value';
+        $kpis[] = $helper->generate();
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-average-lead-time';
+        $helper->icon = 'icon-time';
+        $helper->color = 'color4';
+        $helper->title = $this->l('Average Lead Time', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_lead_time';
+        $kpis[] = $helper->generate();
+
+        $helper = new HelperKpi();
+        $helper->id = 'box-average-guest-in-booking';
+        $helper->icon = 'icon-users';
+        $helper->color = 'color3';
+        $helper->title = $this->l('Average Guest Per Booking', null, null, false);
+        $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_guest_in_booking';
+        $kpis[] = $helper->generate();
+
+        $helper = new HelperKpiRow();
+        $helper->kpis = $kpis;
+        return $helper->generate();
+    }
 
     public function renderView()
     {
