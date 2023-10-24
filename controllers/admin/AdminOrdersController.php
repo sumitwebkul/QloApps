@@ -82,6 +82,18 @@ class AdminOrdersControllerCore extends AdminController
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = a.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil ON (hbil.`id` = hbd.`id_hotel`)';
 
+        // Filters for KPIs because unable to filter orders by defult filters
+        if (Tools::getValue('orders_arrival_today')) {
+            $this->_where .= ' AND hbd.`is_refunded` = 0 AND hbd.`date_from` = \''.pSQL(date('Y-m-d')).' 00:00:00\' AND hbd.`id_status` != '.
+            (int) HotelBookingDetail::STATUS_CHECKED_IN.' AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT;
+        } elseif (Tools::getValue('orders_departures_today')) {
+            $this->_where .= ' AND hbd.`is_refunded` = 0 AND hbd.`date_to` = \''.pSQL(date('Y-m-d')).' 00:00:00\' AND hbd.`id_status` = '.
+            (int) HotelBookingDetail::STATUS_CHECKED_IN;
+        } elseif (Tools::getValue('orders_stay_over')) {
+            $this->_where .= ' AND hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0 AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
+            AND hbd.`date_to` > \''.pSQL(date('Y-m-d')).' 00:00:00\'';
+        }
+
         $this->_orderBy = 'id_order';
         $this->_orderWay = 'DESC';
         $this->_use_found_rows = true;
@@ -1376,33 +1388,41 @@ class AdminOrdersControllerCore extends AdminController
         $helper->icon = 'icon-money';
         $helper->color = 'color2';
         $helper->title = $this->l('Total Due Amount', null, null, false);
+        $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitResetorder=1&due_amount_orders=1';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_due_amount';
         $kpis[] = $helper->generate();
 
+        $arivalDate = date('Y-m-d');
         $helper = new HelperKpi();
         $helper->id = 'box-today-arrivals';
         $helper->icon = 'icon-user';
         $helper->color = 'color1';
         $helper->title = $this->l('Arrivals', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_arrival_today=1';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_arrivals';
         $kpis[] = $helper->generate();
 
+        $departureDate = date('Y-m-d');
         $helper = new HelperKpi();
         $helper->id = 'box-today-departures';
         $helper->icon = 'icon-user';
         $helper->color = 'color2';
         $helper->title = $this->l('Departures', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_departures_today=1';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_departures';
         $kpis[] = $helper->generate();
 
+        $dateFrom = date('Y-m-d');
+        $dateTo = date('Y-m-d', strtotime('+1 day'));
         $helper = new HelperKpi();
         $helper->id = 'box-today-stay-over';
         $helper->icon = 'icon-user';
         $helper->color = 'color4';
         $helper->title = $this->l('Stay Overs', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
+        $helper->href = $this->context->link->getAdminLink('AdminOrders').'&orders_stay_over=1';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_stay_over';
         $kpis[] = $helper->generate();
 
@@ -1411,7 +1431,9 @@ class AdminOrdersControllerCore extends AdminController
         $helper->icon = 'icon-shopping-cart';
         $helper->color = 'color2';
         $helper->title = $this->l('Abandoned Carts', null, null, false);
-        $helper->subtitle = $this->l('Today', null, null, false);
+        $dateFrom = date(Context::getContext()->language->date_format_lite, strtotime('-2 day'));
+        $dateTo = date(Context::getContext()->language->date_format_lite, strtotime('-1 day'));
+        $helper->subtitle = sprintf($this->l('From %s to %s', null, null, false), $dateFrom, $dateTo);
         $helper->href = $this->context->link->getAdminLink('AdminCarts').'&action=filterOnlyAbandonedCarts';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=abandoned_cart';
         $kpis[] = $helper->generate();
