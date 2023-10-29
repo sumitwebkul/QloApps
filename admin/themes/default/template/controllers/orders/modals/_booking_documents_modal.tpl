@@ -17,11 +17,11 @@
  * @license LICENSE.txt
  *}
 
-<div class="modal-body text-center">
+<div class="modal-body">
     <div class="row">
         <div class="col-lg-12">
             <div class="text-left errors-wrap"></div>
-            <div class="documents-list">
+            {* <div class="documents-list">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -33,63 +33,51 @@
                     </thead>
                     <tbody></tbody>
                 </table>
-            </div>
+            </div> *}
             <div class="add-new-document-form" style="margin-top: 10px;">
-                <div class="text-left add-new-wrap">
+                {* <div class="text-left add-new-wrap">
                     <a class="btn btn-primary btn-add-new-document">
                         {l s='Upload new document'}
                     </a>
                     <span></span>
-                </div>
-                <form id="form-add-new-document" class="well" method="post" action="#" style="display: none; margin-top: 5px;">
-
+                </div> *}
+                <form class="form-horizontal" id="form-add-new-document" method="post" action="#">
                     <input type="hidden" name="id_htl_booking" value="0">
-
-                    <div class="form-horizontal">
-                        <div class="form-group">
-                            <label class="control-label col-sm-2">
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <label class="control-label">
                                 <span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Write the title for the document. Invalid characters <>;=#{}'}">
                                     {l s='Title'}
                                 </span>
                             </label>
-                            <div class="col-sm-10">
-                                <div class="input-group fixed-width-xxl">
-                                    <input type="text" name="title" value="" placeholder="{l s='Eg. Passport, Driving license'}" />
-                                </div>
-                            </div>
+                            <input class="form-control" type="text" name="title" value="" placeholder="{l s='eg. passport, driving license'}" />
                         </div>
-                        <div class="form-group">
-                            <label class="control-label required col-sm-2">
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <label class="control-label required">
                                 <span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Choose the document file to be uploaded.'}">
                                     {l s='File'}
                                 </span>
                             </label>
-                            <div class="col-sm-10">
-                                <div class="input-file-wrap"></div>
-                                <div class="input-group fixed-width-xxl">
-                                    <span class="input-group-addon"><i class="icon-file"></i></span>
-                                    <input type="text" class="file-name" readonly="">
-                                    <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default btn-add-file">
-                                            <i class="icon-folder-open"></i>
-                                            {l s='Add file'}
-                                        </button>
-                                    </span>
-                                </div>
-                                <p class="text-left" style="margin-top: 4px; font-style: italic;">
-                                    {l s='Upload a PDF or an image file. Allowed image formats: .gif, .jpg, .jpeg and .png'}
-                                </p>
+                            <div class="input-file-wrap"></div>
+                            <div class="input-group">
+                                <input class="form-control" type="text" class="file-name" readonly="">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-primary btn-add-file">
+                                        <i class="icon-folder-open"></i>
+                                        {l s='Add file'}
+                                    </button>
+                                </span>
                             </div>
-                        </div>
-                        <div class="clearfix btn-group-add-new">
-                            <button class="btn btn-primary pull-right upload" type="submit" name="submitAddPayment">
-                                {l s='Upload'}
-                            </button>
-                            <button class="btn btn-default pull-left cancel">
-                                {l s='Cancel'}
-                            </button>
+                            <p class="text-left" style="margin-top: 4px; font-style: italic;">
+                                {l s='Upload a PDF or an image file. Allowed image formats: .gif, .jpg, .jpeg and .png'}
+                            </p>
                         </div>
                     </div>
+                    <button class="btn btn-primary pull-right upload" type="submit" name="submitAddPayment" style="display:none;">
+                        {l s='Upload'}
+                    </button>
                 </form>
             </div>
         </div>

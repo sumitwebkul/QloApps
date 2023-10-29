@@ -33,7 +33,7 @@
 		{$data.room_num}
 	</td>
 	<td class="text-center">
-		<img src="{$data.image_link}" title="Room image" />
+		<img src="{$data.image_link}" title="Room image" class="img-thumbnail"/>
 	</td>
 	<td class="text-center">
 		<p>{$data.room_type}</p>
@@ -49,7 +49,7 @@
 		{/if} *}
 	</td>
 	<td class="text-center">
-		<a href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
+		<a class="order_detail_link" href="{$link->getAdminLink('AdminAddHotel')}&amp;id={$data['id_hotel']}&amp;updatehtl_branch_info" target="_blank">
 			<span>{$data['hotel_name']}</span>
 		</a>
 	</td>

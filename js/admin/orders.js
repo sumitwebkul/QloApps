@@ -354,7 +354,7 @@ function init()
 
 	$('#add_voucher').unbind('click').click(function(e) {
 		$('.order_action').hide();
-		$('.panel-vouchers,#voucher_form').show();
+		VoucherModal.show();
 		e.preventDefault();
 	});
 
@@ -398,10 +398,7 @@ function init()
 	});
 
 	$('.open_payment_information').unbind('click').click(function(e) {
-		if ($(this).parent().parent().next('tr').is(':visible'))
-			$(this).parent().parent().next('tr').hide();
-		else
-			$(this).parent().parent().next('tr').show();
+		OrderPaymentDetailModal.show($(this));
 		e.preventDefault();
 	});
 
@@ -1516,14 +1513,12 @@ function initRoomEvents()
 	});
 
 	$('#add_new_payment').on('click', function(e) {
-		$('#form_add_payment').show('fast');
-		$(this).hide();
+		OrderPaymentModal.show();
 	});
 
 	$('#cancle_add_payment').on('click', function(e) {
 		e.preventDefault();
-		$('#form_add_payment').hide('fast');
-		$('#add_new_payment').show('fast');
+		OrderPaymentModal.hide();
 	});
 
     /*By webkul Code for the datepicker*/
@@ -1946,3 +1941,197 @@ const BookingDocumentsForm = {
 		$('#booking-documents-modal #form-add-new-document').hide(200);
 	},
 }
+
+// Voucher modal processes
+$(document).on('click', '.submitVoucher', function(e) {
+    e.preventDefault();
+    VoucherModal.submit();
+});
+
+const VoucherModal = {
+	show: function() {
+		$('#voucher-modal').modal('show');
+	},
+    close: function() {
+		$('#voucher-modal').modal('hide');
+	},
+    submit: function() {
+        $(document).find('#submitNewVoucher').click();
+    }
+};
+
+// Order payment modal processes
+$(document).on('click', '.submitOrderPayment', function(e) {
+    e.preventDefault();
+    OrderPaymentModal.submit();
+});
+
+const OrderPaymentModal = {
+	show: function() {
+		$('#order-payment-modal').modal('show');
+	},
+    close: function() {
+		$('#order-payment-modal').modal('hide');
+	},
+    submit: function() {
+        $(document).find('#submitAddPayment').click();
+    }
+};
+
+const OrderPaymentDetailModal = {
+	show: function(paymentObj) {
+        $('#payment-detail-modal #payment_date').html(paymentObj.data('payment_date'));
+        $('#payment-detail-modal #payment_method').html(paymentObj.data('payment_method'));
+        $('#payment-detail-modal #payment_source').html(paymentObj.data('payment_source'));
+        $('#payment-detail-modal #transaction_id').html(paymentObj.data('transaction_id'));
+        $('#payment-detail-modal #card_number').html(paymentObj.data('card_number'));
+        $('#payment-detail-modal #card_brand').html(paymentObj.data('card_brand'));
+        $('#payment-detail-modal #card_expiration').html(paymentObj.data('card_expiration'));
+        $('#payment-detail-modal #card_holder').html(paymentObj.data('card_holder'));
+        $('#payment-detail-modal #amount').html(paymentObj.data('amount'));
+        $('#payment-detail-modal #invoice_number').html(paymentObj.data('invoice_number'));
+		$('#payment-detail-modal').modal('show');
+	},
+    close: function() {
+		$('#payment-detail-modal').modal('hide');
+	},
+};
+
+// for order invoice notes
+$(document).on('click', '.add_document_note', function(e) {
+    e.preventDefault();
+    documentNoteModal.show($(this));
+});
+
+$(document).on('click', '.submitDocumentNote', function(e) {
+    e.preventDefault();
+    documentNoteModal.submit();
+});
+
+const documentNoteModal = {
+	show: function(documentobj) {
+        $('#document-note-modal #id_order_invoice').val(documentobj.data('id_order_invoice'));
+        $('#document-note-modal #editNote').text(documentobj.data('edit_note'));
+
+		$('#document-note-modal').modal('show');
+	},
+    close: function() {
+		$('#document-note-modal').modal('hide');
+	},
+    submit: function() {
+        $(document).find('#submitEditNote').click();
+	}
+};
+
+// for updating (Traveller) customer guest details
+$(document).on('click', '#edit_guest_details', function(e) {
+    e.preventDefault();
+    TravellerModal.show();
+});
+
+$(document).on('click', '.submitTravellerInfo', function(e) {
+    e.preventDefault();
+    TravellerModal.submit();
+});
+
+const TravellerModal = {
+	show: function() {
+		$('#traveller-modal').modal('show');
+	},
+    close: function() {
+		$('#traveller-modal').modal('hide');
+	},
+    submit: function() {
+        $.ajax({
+            type: 'POST',
+            headers: {
+                "cache-control": "no-cache"
+            },
+            url: admin_order_tab_link,
+            dataType: 'JSON',
+            cache: false,
+            data: $('#customer-guest-details-form').serialize()+'&ajax=true&id_order='+id_order+'&action=updateGuestDetails',
+            success: function(result) {
+                if (result.success) {
+                    if (result.msg) {
+                        showSuccessMessage(result.msg);
+                    }
+
+                    if (result.data.guest_name) {
+                        $('#customer-guest-details .gender_name').text(result.data.gender_name);
+                    }
+                    if (result.data.guest_name) {
+                        $('#customer-guest-details .guest_name').text(result.data.guest_name);
+                    }
+                    if (result.data.guest_email) {
+                        $('#customer-guest-details .guest_email a').attr('href', 'mailto:'+result.data.guest_email).html('<i class="icon-envelope-o"></i> ' + result.data.guest_email);
+                    }
+                    if (result.data.guest_phone) {
+                        $('#customer-guest-details .guest_phone a').attr('href', 'tel'+result.data.guest_phone).html('<i class="icon-phone"></i> ' + result.data.guest_phone);
+                    }
+
+                    TravellerModal.hide();
+                } else if (result.errors) {
+                    showErrorMessage(result.errors);
+                }
+            }
+        });
+	}
+};
+
+
+// for updating Room status
+$(document).on('click', '#open_room_status_form', function(e) {
+    e.preventDefault();
+    TravellerModal.show();
+});
+
+$(document).on('click', '.submitTravellerInfo', function(e) {
+    e.preventDefault();
+    TravellerModal.submit();
+});
+
+const RoomStatusModal = {
+	show: function() {
+		$('#traveller-modal').modal('show');
+	},
+    close: function() {
+		$('#traveller-modal').modal('hide');
+	},
+    submit: function() {
+        $.ajax({
+            type: 'POST',
+            headers: {
+                "cache-control": "no-cache"
+            },
+            url: admin_order_tab_link,
+            dataType: 'JSON',
+            cache: false,
+            data: $('#customer-guest-details-form').serialize()+'&ajax=true&id_order='+id_order+'&action=updateGuestDetails',
+            success: function(result) {
+                if (result.success) {
+                    if (result.msg) {
+                        showSuccessMessage(result.msg);
+                    }
+
+                    if (result.data.guest_name) {
+                        $('#customer-guest-details .gender_name').text(result.data.gender_name);
+                    }
+                    if (result.data.guest_name) {
+                        $('#customer-guest-details .guest_name').text(result.data.guest_name);
+                    }
+                    if (result.data.guest_email) {
+                        $('#customer-guest-details .guest_email a').attr('href', 'mailto:'+result.data.guest_email).html('<i class="icon-envelope-o"></i> ' + result.data.guest_email);
+                    }
+                    if (result.data.guest_phone) {
+                        $('#customer-guest-details .guest_phone a').attr('href', 'tel'+result.data.guest_phone).html('<i class="icon-phone"></i> ' + result.data.guest_phone);
+                    }
+
+                    TravellerModal.hide();
+                } else if (result.errors) {
+                    showErrorMessage(result.errors);
+                }
+            }
+        });
+	}
+};

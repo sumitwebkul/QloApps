@@ -413,7 +413,217 @@ class AdminOrdersControllerCore extends AdminController
     public function initModal()
     {
         parent::initModal();
-        $this->modals[] = $this->getBookingDocumentsModal();
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $this->context->smarty->assign(
+                array(
+                    'current_id_lang' => $this->context->language->id,
+                    'current_index' => self::$currentIndex,
+                    'order' => $objOrder,
+                    'currency' => new Currency($objOrder->id_currency),
+                    'invoices_collection' => $objOrder->getInvoicesCollection(),
+                )
+            );
+            $this->modals[] = $this->initBookingDocumentsModal();
+            $this->modals[] = $this->initVoucherModal();
+            $this->modals[] = $this->initOrderPaymentModal();
+            $this->modals[] = $this->initTravellerModal();
+            $this->modals[] = $this->initOrderPaymentDetailModal();
+            $this->modals[] = $this->initOrderDocumentNoteModal();
+            $this->modals[] = $this->initRoomStatusModal();
+        }
+    }
+
+    public function initBookingDocumentsModal()
+    {
+        // set modal details
+        $modal = array(
+            'modal_id' => 'booking-documents-modal',
+            'modal_class' => 'modal-md order_detail_modal',
+            'modal_title' => '<i class="icon icon-file-text"></i> &nbsp'.$this->l('Documents'),
+            'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_booking_documents_modal.tpl'),
+            'modal_actions' => array(
+                array(
+                    'type' => 'button',
+                    'value' => 'submitDocument',
+                    'class' => 'btn-primary pull-right upload',
+                    'label' => '<i class="icon-cloud-upload"></i> '.$this->l('Upload'),
+                ),
+            ),
+        );
+
+        return $modal;
+    }
+
+    public function initOrderDocumentNoteModal()
+    {
+        // set modal details
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $modal = array(
+                'modal_id' => 'document-note-modal',
+                'modal_class' => 'order_detail_modal',
+                'modal_title' => '<i class="icon icon-file"></i> &nbsp'.$this->l('Note'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_document_note.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitDocumentNote',
+                        'class' => 'submitDocumentNote btn-primary pull-right',
+                        'label' => '<i class="icon-file"></i> '.$this->l('Save Note'),
+                    ),
+                ),
+            );
+
+            return $modal;
+        }
+
+        return false;
+    }
+
+    public function initVoucherModal()
+    {
+        // set modal details
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $modal = array(
+                'modal_id' => 'voucher-modal',
+                'modal_class' => 'order_detail_modal',
+                'modal_title' => '<i class="icon icon-tag"></i> &nbsp'.$this->l('Voucher'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_discount_form.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitVoucher',
+                        'class' => 'submitVoucher btn-primary pull-right',
+                        'label' => '<i class="icon-tag"></i> '.$this->l('Add Voucher'),
+                    ),
+                ),
+            );
+
+            return $modal;
+        }
+
+        return false;
+    }
+
+    public function initOrderPaymentModal()
+    {
+        // set modal details
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $payment_methods = array();
+            foreach (PaymentModule::getInstalledPaymentModules() as $payment) {
+                $module = Module::getInstanceByName($payment['name']);
+                if (Validate::isLoadedObject($module) && $module->active) {
+                    $payment_methods[] = $module->displayName;
+                }
+            }
+            $this->context->smarty->assign(
+                array(
+                    'currencies' => Currency::getCurrenciesByIdShop($objOrder->id_shop),
+                    'payment_methods' => $payment_methods,
+                    'payment_types' => $this->getPaymentsTypes(),
+                )
+            );
+            $modal = array(
+                'modal_id' => 'order-payment-modal',
+                'modal_class' => 'order_detail_modal',
+                'modal_title' => '<i class="icon icon-credit-card"></i> &nbsp'.$this->l('Order Payment'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_order_payment_form.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitOrderPayment',
+                        'class' => 'submitOrderPayment btn-primary pull-right',
+                        'label' => '<i class="icon-credit-card"></i> '.$this->l('Add Payment'),
+                    ),
+                ),
+            );
+
+            return $modal;
+        }
+
+        return false;
+    }
+
+    public function initTravellerModal()
+    {
+        // set modal details
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            // get details if booking is done for some other guest
+            $customerGuestDetail = false;
+            if ($id_customer_guest_detail = OrderCustomerGuestDetail::isCustomerGuestBooking($objOrder->id)) {
+                $customerGuestDetail = new OrderCustomerGuestDetail($id_customer_guest_detail);
+                $customerGuestDetail->gender = new Gender($customerGuestDetail->id_gender, $this->context->language->id);
+            }
+
+            if ($customerGuestDetail) {
+                $this->context->smarty->assign(
+                    array(
+                        'genders' => Gender::getGenders(),
+                        'customerGuestDetail' => $customerGuestDetail,
+                    )
+                );
+                $modal = array(
+                    'modal_id' => 'traveller-modal',
+                    'modal_class' => 'order_detail_modal',
+                    'modal_title' => '<i class="icon icon-user"></i> &nbsp'.$this->l('Traveller'),
+                    'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_traveller_form.tpl'),
+                    'modal_actions' => array(
+                        array(
+                            'type' => 'button',
+                            'value' => 'submitTravellerInfo',
+                            'class' => 'submitTravellerInfo btn-primary pull-right',
+                            'label' => '<i class="icon-user"></i> '.$this->l('Save Traveller'),
+                        ),
+                    ),
+                );
+
+                return $modal;
+            }
+        }
+
+        return false;
+    }
+
+    public function initOrderPaymentDetailModal()
+    {
+        // set modal details
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $modal = array(
+                'modal_id' => 'payment-detail-modal',
+                'modal_class' => 'order_detail_modal',
+                'modal_title' => '<i class="icon icon-credit-card"></i> &nbsp'.$this->l('Payment Detail'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_order_payment_detail.tpl'),
+                'modal_actions' => array(),
+            );
+
+            return $modal;
+        }
+
+        return false;
+    }
+
+    public function initRoomStatusModal()
+    {
+        // set modal details
+        if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
+            $modal = array(
+                'modal_id' => 'room-status-modal',
+                'modal_class' => 'order_detail_modal',
+                'modal_title' => '<i class="icon icon-credit-card"></i> &nbsp'.$this->l('Guest CheckIn - Checkout'),
+                'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_room_status_form.tpl'),
+                'modal_actions' => array(
+                    array(
+                        'type' => 'button',
+                        'value' => 'submitRoomStatus',
+                        'class' => 'submitRoomStatus btn-primary pull-right',
+                        'label' => '<i class="icon-bed"></i> '.$this->l('Update Status'),
+                    ),
+                ),
+            );
+
+            return $modal;
+        }
+
+        return false;
     }
 
     public function setMedia()
@@ -781,7 +991,7 @@ class AdminOrdersControllerCore extends AdminController
                         $customer_message->id_customer_thread = $customer_thread->id;
                         $customer_message->id_employee = (int)$this->context->employee->id;
                         $customer_message->message = Tools::getValue('message');
-                        $customer_message->private = Tools::getValue('visibility');
+                        $customer_message->private = !Tools::getValue('visibility');
 
                         if (!$customer_message->add()) {
                             $this->errors[] = Tools::displayError('An error occurred while saving the message.');
@@ -1478,14 +1688,6 @@ class AdminOrdersControllerCore extends AdminController
                 }
             }
         }
-
-        $payment_methods = array();
-        foreach (PaymentModule::getInstalledPaymentModules() as $payment) {
-            $module = Module::getInstanceByName($payment['name']);
-            if (Validate::isLoadedObject($module) && $module->active) {
-                $payment_methods[] = $module->displayName;
-            }
-        }
         // display warning if there are products out of stock
         $display_out_of_stock_warning = false;
         $current_order_state = $order->getCurrentOrderState();
@@ -1777,7 +1979,6 @@ class AdminOrdersControllerCore extends AdminController
             'customer' => $customer,
             'gender' => $gender,
             'customerGuestDetail' => $customerGuestDetail,
-            'genders' => Gender::getGenders(),
             'customer_addresses' => $customer->getAddresses($this->context->language->id),
             'addresses' => array(
                 'delivery' => $addressDelivery,
@@ -1800,7 +2001,6 @@ class AdminOrdersControllerCore extends AdminController
             'sources' => ConnectionsSource::getOrderSources($order->id),
             'currentState' => $order->getCurrentOrderState(),
             'currency' => new Currency($order->id_currency),
-            'currencies' => Currency::getCurrenciesByIdShop($order->id_shop),
             'previousOrder' => $order->getPreviousOrderId(),
             'nextOrder' => $order->getNextOrderId(),
             'current_index' => self::$currentIndex,
@@ -1811,8 +2011,6 @@ class AdminOrdersControllerCore extends AdminController
             'current_id_lang' => $this->context->language->id,
             'invoices_collection' => $order->getInvoicesCollection(),
             'not_paid_invoices_collection' => $order->getNotPaidInvoicesCollection(),
-            'payment_methods' => $payment_methods,
-            'payment_types' => $this->getPaymentsTypes(),
             'invoice_management_active' => Configuration::get('PS_INVOICE', null, null, $order->id_shop),
             'display_warehouse' => (int)Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT'),
             'HOOK_CONTENT_ORDER' => Hook::exec(
@@ -1844,25 +2042,10 @@ class AdminOrdersControllerCore extends AdminController
                 'customer' => $customer)
             ),
             'isCancelledRoom' => $isCancelledRoom,
+            'orderDocuments' => $order->getDocuments()
         );
 
         return parent::renderView();
-    }
-
-    public function getBookingDocumentsModal()
-    {
-        $modalContent = $this->context->smarty->fetch('controllers/orders/_booking_documents_modal.tpl');
-
-        // set modal details
-        $modal = array(
-            'modal_id' => 'booking-documents-modal',
-            'modal_class' => 'modal-md',
-            'modal_title' => $this->l('Documents'),
-            'modal_content' => $modalContent,
-            'modal_actions' => array(), // required to show Close button
-        );
-
-        return $modal;
     }
 
     public function ajaxProcessGetBookingDocuments()
@@ -1980,7 +2163,8 @@ class AdminOrdersControllerCore extends AdminController
                         if ($objCustomerGuestDetail->save()) {
                             $response['success'] = true;
                             $gender = new Gender($objCustomerGuestDetail->id_gender, $this->context->language->id);
-                            $response['data']['guest_name'] = $gender->name.' '.$objCustomerGuestDetail->firstname.' '.$objCustomerGuestDetail->lastname ;
+                            $response['data']['gender_name'] = $gender->name;
+                            $response['data']['guest_name'] = $objCustomerGuestDetail->firstname.' '.$objCustomerGuestDetail->lastname ;
                             $response['data']['guest_email'] = $objCustomerGuestDetail->email;
                             $response['data']['guest_phone'] = $objCustomerGuestDetail->phone;
                             $response['msg'] = $this->l('Guest details are updated.');
