@@ -536,7 +536,7 @@ class CartRuleCore extends ObjectModel
         }
 
         // Get an intersection of the customer groups and the cart rule groups (if the customer is not logged in, the default group is Visitors)
-        if ($this->group_restriction) {
+        if ($this->group_restriction && Group::isFeatureActive()) {
             $id_cart_rule = (int)Db::getInstance()->getValue('
 			SELECT crg.id_cart_rule
 			FROM '._DB_PREFIX_.'cart_rule_group crg
