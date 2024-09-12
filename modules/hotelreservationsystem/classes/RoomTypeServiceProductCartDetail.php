@@ -164,9 +164,6 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
         );
     }
 
-    /**
-     * @deprecated since 1.6.1 use getServiceProductsInCart() instead
-    */
     public function getRoomServiceProducts(
         $htlCartBookingId,
         $idLang = 0,
@@ -192,7 +189,7 @@ class RoomTypeServiceProductCartDetail extends ObjectModel
             );
 
             if (isset($selectedServiceProducts[$htlCartBookingId]['selected_products_info'])) {
-                return $selectedServiceProducts;
+                return $selectedServiceProducts[$htlCartBookingId]['selected_products_info'];
             }
         }
 
