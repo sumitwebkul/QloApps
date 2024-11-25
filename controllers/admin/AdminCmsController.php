@@ -35,6 +35,8 @@ class AdminCmsControllerCore extends AdminController
 
     protected $position_identifier = 'id_cms';
 
+    protected $_category;
+
     public function __construct()
     {
         $this->bootstrap = true;

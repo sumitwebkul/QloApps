@@ -123,6 +123,9 @@ class FrontControllerCore extends Controller
      */
     public $nb_items_per_page;
 
+    /** @var string Page name */
+    public $page_name;
+
     /**
      * Controller constructor
      *
@@ -1032,14 +1035,22 @@ class FrontControllerCore extends Controller
         if (!in_array($_SERVER['SERVER_NAME'], array('localhost', '127.0.0.1'))) {
             /* Check if Maxmind Database exists */
             if (@filemtime(_PS_GEOIP_DIR_._PS_GEOIP_CITY_FILE_)) {
-                if (!isset($this->context->cookie->iso_code_country) || (isset($this->context->cookie->iso_code_country) && !in_array(strtoupper($this->context->cookie->iso_code_country), explode(';', Configuration::get('PS_ALLOWED_COUNTRIES'))))) {
-                    include_once(_PS_GEOIP_DIR_.'geoipcity.inc');
+                if (!isset($this->context->cookie->iso_code_country) || (isset($this->context->cookie->iso_code_country)
+                    && !in_array(strtoupper($this->context->cookie->iso_code_country), explode(';', Configuration::get('PS_ALLOWED_COUNTRIES'))))
+                ) {
+                    include_once(_PS_GEOIP_DIR_.'autoload.php');
 
-                    $gi = geoip_open(realpath(_PS_GEOIP_DIR_._PS_GEOIP_CITY_FILE_), GEOIP_STANDARD);
-                    $record = geoip_record_by_addr($gi, Tools::getRemoteAddr());
+                    $reader = new GeoIp2\Database\Reader(_PS_GEOIP_DIR_ . _PS_GEOIP_CITY_FILE_);
+                    try {
+                        $record = $reader->city(Tools::getRemoteAddr());
+                    } catch (GeoIp2\Exception\AddressNotFoundException $e) {
+                        $record = null;
+                    }
 
                     if (is_object($record)) {
-                        if (!in_array(strtoupper($record->country_code), explode(';', Configuration::get('PS_ALLOWED_COUNTRIES'))) && !FrontController::isInWhitelistForGeolocation()) {
+                        if (!in_array(strtoupper($record->country->isoCode), explode(';', Configuration::get('PS_ALLOWED_COUNTRIES')))
+                            && !FrontController::isInWhitelistForGeolocation()
+                        ) {
                             if (Configuration::get('PS_GEOLOCATION_BEHAVIOR') == _PS_GEOLOCATION_NO_CATALOG_) {
                                 $this->restrictedCountry = true;
                             } elseif (Configuration::get('PS_GEOLOCATION_BEHAVIOR') == _PS_GEOLOCATION_NO_ORDER_) {
@@ -1050,30 +1061,37 @@ class FrontControllerCore extends Controller
                             }
                         } else {
                             $has_been_set = !isset($this->context->cookie->iso_code_country);
-                            $this->context->cookie->iso_code_country = strtoupper($record->country_code);
+                            $this->context->cookie->iso_code_country = strtoupper($record->country->isoCode);
                         }
                     }
                 }
 
-                if (isset($this->context->cookie->iso_code_country) && $this->context->cookie->iso_code_country && !Validate::isLanguageIsoCode($this->context->cookie->iso_code_country)) {
+                if (isset($this->context->cookie->iso_code_country)
+                    && $this->context->cookie->iso_code_country
+                    && !Validate::isLanguageIsoCode($this->context->cookie->iso_code_country)
+                ) {
                     $this->context->cookie->iso_code_country = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
                 }
 
-                if (isset($this->context->cookie->iso_code_country) && ($id_country = (int)Country::getByIso(strtoupper($this->context->cookie->iso_code_country)))) {
+                if (isset($this->context->cookie->iso_code_country)
+                    && ($id_country = (int)Country::getByIso(strtoupper($this->context->cookie->iso_code_country)))
+                ) {
                     /* Update defaultCountry */
                     if ($default_country->iso_code != $this->context->cookie->iso_code_country) {
                         $default_country = new Country($id_country);
                     }
+
                     if (isset($has_been_set) && $has_been_set) {
                         $this->context->cookie->id_currency = (int)($default_country->id_currency ? (int)$default_country->id_currency : (int)Configuration::get('PS_CURRENCY_DEFAULT'));
                     }
+
                     return $default_country;
                 } elseif (Configuration::get('PS_GEOLOCATION_NA_BEHAVIOR') == _PS_GEOLOCATION_NO_CATALOG_ && !FrontController::isInWhitelistForGeolocation()) {
                     $this->restrictedCountry = true;
                 } elseif (Configuration::get('PS_GEOLOCATION_NA_BEHAVIOR') == _PS_GEOLOCATION_NO_ORDER_ && !FrontController::isInWhitelistForGeolocation()) {
                     $this->context->smarty->assign(array(
                         'restricted_country_mode' => true,
-                        'geolocation_country'     => isset($record->country_name) && $record->country_name ? $record->country_name : 'Undefined'
+                        'geolocation_country'     => isset($record->country->name) && $record->country->name ? $record->country->name : 'Undefined'
                     ));
                 }
             }

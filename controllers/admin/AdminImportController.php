@@ -864,7 +864,7 @@ class AdminImportControllerCore extends AdminController
      * @param bool $regenerate
      * @return bool
      */
-    protected static function copyImg($id_entity, $id_image = null, $url, $entity = 'products', $regenerate = true)
+    protected static function copyImg($id_entity, $id_image = null, $url = '', $entity = 'products', $regenerate = true)
     {
         $tmpfile = tempnam(_PS_TMP_IMG_DIR_, 'ps_import');
         $watermark_types = explode(',', Configuration::get('WATERMARK_TYPES'));
@@ -1349,17 +1349,41 @@ class AdminImportControllerCore extends AdminController
                             }
 
                             $country = Country::getNameById($idLangDefault, $info['id_country']);
-                            if ($catCountry = $objHotelBranch->addCategory($country, false, $groupIds)) {
+                            if ($catCountry = $objHotelBranch->addCategory(
+                                array (
+                                    'name' => $country,
+                                    'group_ids' => $groupIds,
+                                    'parent_category' => false
+                                )
+                            )) {
                                 if ($info['id_state']) {
                                     $objState = new State();
                                     $stateName = $objState->getNameById($info['id_state']);
-                                    $catState = $objHotelBranch->addCategory($stateName, $catCountry, $groupIds);
+                                    $catState = $objHotelBranch->addCategory(
+                                        array (
+                                            'name' => $stateName,
+                                            'group_ids' => $groupIds,
+                                            'parent_category' => $catCountry
+                                        )
+                                    );
                                 } else {
-                                    $catState = $objHotelBranch->addCategory($info['city'], $catCountry, $groupIds);
+                                    $catState = $objHotelBranch->addCategory(
+                                        array (
+                                            'name' => $info['city'],
+                                            'group_ids' => $groupIds,
+                                            'parent_category' => $catCountry
+                                        )
+                                    );
                                 }
 
                                 if ($catState) {
-                                    if ($catCity = $objHotelBranch->addCategory($info['city'], $catState, $groupIds)) {
+                                    if ($catCity = $objHotelBranch->addCategory(
+                                        array (
+                                            'name' => $info['city'],
+                                            'group_ids' => $groupIds,
+                                            'parent_category' => $catState
+                                        )
+                                    )) {
                                         if ($objHotelBranch->id_category) {
                                             $objCategory = new Category($objHotelBranch->id_category);
                                             $objCategory->name = $objHotelBranch->hotel_name;
@@ -1372,7 +1396,14 @@ class AdminImportControllerCore extends AdminController
                                             Category::regenerateEntireNtree();
                                         } else {
                                             if ($catHotel = $objHotelBranch->addCategory(
-                                                $objHotelBranch->hotel_name, $catCity, $groupIds, 1, $objHotelBranch->id, $linkRewriteArray
+                                                array (
+                                                    'name' => $objHotelBranch->hotel_name,
+                                                    'group_ids' => $groupIds,
+                                                    'parent_category' => $catCity,
+                                                    'is_hotel' => 1,
+                                                    'id_hotel' => $objHotelBranch->id,
+                                                    'link_rewrite' => $linkRewriteArray
+                                                )
                                             )) {
                                                 $objHotelBranch = new HotelBranchInformation($objHotelBranch->id);
                                                 $objHotelBranch->id_category = $catHotel;
@@ -3186,7 +3217,7 @@ class AdminImportControllerCore extends AdminController
 
     public function utf8EncodeArray($array)
     {
-        return (is_array($array) ? array_map('utf8_encode', $array) : utf8_encode($array));
+        return (is_array($array) ? array_map('utf8_encode', $array) : mb_convert_encoding($array, 'UTF-8', 'ISO-8859-1'));
     }
 
     protected function getNbrColumn($handle, $glue)

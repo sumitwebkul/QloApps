@@ -57,7 +57,7 @@ class StockManagerCore implements StockManagerInterface
      */
     public function addProduct(
         $id_product,
-        $id_product_attribute = 0,
+        $id_product_attribute,
         Warehouse $warehouse,
         $quantity,
         $id_stock_mvt_reason,
@@ -217,7 +217,7 @@ class StockManagerCore implements StockManagerInterface
      */
     public function removeProduct(
         $id_product,
-        $id_product_attribute = null,
+        $id_product_attribute,
         Warehouse $warehouse,
         $quantity,
         $id_stock_mvt_reason,

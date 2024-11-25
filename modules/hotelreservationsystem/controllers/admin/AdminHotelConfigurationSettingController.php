@@ -308,7 +308,7 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
 
             if (isset($pos[2]) && (int) $pos[2] === $idSettingsLink) {
                 if ($objHotelSettingsLink = new HotelSettingsLink((int) $pos[2])) {
-                    if (isset($position) && $objHotelSettingsLink->updatePosition($way, $position, $idSettingsLink)) {
+                    if (isset($position) && $objHotelSettingsLink->updatePosition($way, $position)) {
                         $this->ajaxDie(json_encode(true));
                     } else {
                         $this->ajaxDie(json_encode(array(

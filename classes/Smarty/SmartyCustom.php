@@ -24,8 +24,11 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
+
 class SmartyCustomCore extends Smarty
 {
+    public $template_class = null;
+
     public function __construct()
     {
         parent::__construct();

@@ -1361,8 +1361,7 @@ class CartRuleCore extends ObjectModel
                 .(in_array($type, array('carrier', 'shop')) ? ' AND t.deleted = 0' : '').
                 (in_array($type, array('carrier', 'shop')) ? ' ORDER BY t.name ASC ' : '').
                 (in_array($type, array('country', 'group', 'cart_rule')) && $i18n ? ' ORDER BY tl.name ASC ' : '').
-                $sql_limit,
-                false);
+                $sql_limit);
                 while ($row = Db::getInstance()->nextRow($resource)) {
                     $array[($row['selected'] || $this->{$type.'_restriction'} == 0) ? 'selected' : 'unselected'][] = $row;
                 }

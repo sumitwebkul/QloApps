@@ -483,7 +483,7 @@ class LinkCore
             }
         } else {
             // @FIXME html_entity_decode has been added due to '&amp;' => '%3B' ...
-            $request = html_entity_decode($request);
+            $request = html_entity_decode($request ?? '');
             if ($request_url_encode) {
                 $request = urlencode($request);
             }
@@ -700,8 +700,8 @@ class LinkCore
 
     public function matchQuickLink($url)
     {
-        $quicklink = $this->getQuickLink($url);
-        if (isset($quicklink) && $quicklink === ($this->getQuickLink($_SERVER['REQUEST_URI']))) {
+        $quicklink = Link::getQuickLink($url);
+        if (isset($quicklink) && $quicklink === (Link::getQuickLink($_SERVER['REQUEST_URI']))) {
             return true;
         } else {
             return false;

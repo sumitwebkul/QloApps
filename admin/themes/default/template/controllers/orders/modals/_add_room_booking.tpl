@@ -126,7 +126,7 @@
                 {/if}
             </div>
 
-            {if sizeof($invoices_collection)}
+            {if isset($invoices_collection) && sizeof($invoices_collection)}
                 <div class="form-group">
                     <label class="control-label">{l s='Invoice'}</label>
                     <select class="form-control" name="add_product[invoice]" id="add_product_product_invoice" disabled="disabled">

@@ -46,6 +46,10 @@ class HotelBookingDocument extends ObjectModel
         ),
     );
 
+    protected $documentsBaseDir;
+    protected $sourceIndexFile;
+    protected $documentFolder;
+
     public function __construct($id = null)
     {
         $this->file_name = '';

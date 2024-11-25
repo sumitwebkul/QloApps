@@ -519,7 +519,7 @@ class AdminCartsControllerCore extends AdminController
             // Don't try to use a product if not instanciated before due to errors
             if (isset($product) && $product->id) {
                 if (($id_product_attribute = Tools::getValue('id_product_attribute')) != 0) {
-                    if (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !Attribute::checkAttributeQty((int)$id_product_attribute, (int)$qty)) {
+                    if (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !ProductAttribute::checkAttributeQty((int)$id_product_attribute, (int)$qty)) {
                         $errors[] = Tools::displayError('There is not enough product in stock.');
                     }
                 } elseif (!$product->checkQty((int)$qty)) {
@@ -544,7 +544,7 @@ class AdminCartsControllerCore extends AdminController
                 if (!($qty_upd = $this->context->cart->updateQty($qty, $id_product, (int)$id_product_attribute, (int)$id_customization, $operator))) {
                     $errors[] = Tools::displayError('You already have the maximum quantity available for this product.');
                 } elseif ($qty_upd < 0) {
-                    $minimal_qty = $id_product_attribute ? Attribute::getAttributeMinimalQty((int)$id_product_attribute) : $product->minimal_quantity;
+                    $minimal_qty = $id_product_attribute ? ProductAttribute::getAttributeMinimalQty((int)$id_product_attribute) : $product->minimal_quantity;
                     $errors[] = sprintf(Tools::displayError('You must add a minimum quantity of %d', false), $minimal_qty);
                 }
             }
@@ -609,13 +609,22 @@ class AdminCartsControllerCore extends AdminController
             #Code is added by webkul to change current cart tpl dinamically
             #################################################################
             $id_cart = Tools::getValue('id_cart');//get cart id from url
+            $cart = new Cart($id_cart);
             $cart_detail_data = array();
             $cart_detail_data_obj = new HotelCartBookingData();
             $cart_detail_data_obj->updateIdCurrencyByIdCart($id_cart, $currency->id);
             $cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart);
+
+            $occupancyRequiredForBooking = false;
+            if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+                $occupancyRequiredForBooking = true;
+            }
+
             $this->context->smarty->assign(array(
+                'cart' => $cart,
                 'cart_detail_data' => $cart_detail_data,
                 'currency' => new Currency((int)$this->context->cart->id_currency),
+                'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             ));
 
             $tpl_path = 'default/template/controllers/orders/_current_cart_details_data.tpl';
@@ -1168,7 +1177,7 @@ class AdminCartsControllerCore extends AdminController
         return Cart::getTotalCart($id_cart, true, Cart::BOTH_WITHOUT_SHIPPING);
     }
 
-    public function displayDeleteLink($token = null, $id, $name = null)
+    public function displayDeleteLink($token, $id, $name = null)
     {
         // don't display ordered carts
         foreach ($this->_list as $row) {

@@ -136,10 +136,8 @@ class CategoryCore extends ObjectModel
     {
         parent::__construct($id_category, $id_lang, $id_shop);
 
-        $link = new Link();
-        $imgLink = $link->getMediaLink(_PS_CAT_IMG_DIR_.(int)$this->id.'.jpg'); // by webkul use media link for images
-        $this->id_image = ($this->id && (bool)Tools::file_get_contents($imgLink)) ? (int)$this->id : false;
         $this->image_dir = _PS_CAT_IMG_DIR_;
+        $this->id_image = ($this->id && file_exists($this->image_dir . (int) $this->id . '.jpg')) ? (int) $this->id : false;
     }
 
     public static function getDescriptionClean($description)
@@ -221,7 +219,7 @@ class CategoryCore extends ObjectModel
 
         $ret = parent::update($null_values);
         if ($changed && (!isset($this->doNotRegenerateNTree) || !$this->doNotRegenerateNTree)) {
-            $this->cleanPositions((int)$this->id_parent);
+            Category::cleanPositions((int)$this->id_parent);
             Category::regenerateEntireNtree();
             $this->recalculateLevelDepth($this->id);
         }

@@ -32,6 +32,11 @@ class OrderOpcControllerCore extends ParentOrderController
     protected $ajax_refresh = false;
 
     /**
+     * @var CheckoutProcess
+     */
+    protected $checkoutProcess;
+
+    /**
      * Initialize order opc controller
      * @see FrontController::init()
      */

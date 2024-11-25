@@ -201,7 +201,7 @@ class OrderCore extends ObjectModel
     public $is_advance_payment;
 
     /**
-    * @var int advance_paid_amount used to save paid amount for the advance payment
+    * @var float advance_paid_amount used to save paid amount for the advance payment
     */
     public $advance_paid_amount;
 
@@ -209,6 +209,16 @@ class OrderCore extends ObjectModel
     * @var int is occupancy provided in this order
     */
     public $with_occupancy;
+
+    /**
+     * @var float
+     */
+    public $amount_paid;
+
+    /**
+     * @var array
+     */
+    public $product_list = [];
 
     /**
      * @see ObjectModel::$definition
@@ -1351,7 +1361,7 @@ class OrderCore extends ObjectModel
             $this->setInvoiceDetails($order_invoice);
 
             if (Configuration::get('PS_INVOICE')) {
-                $this->setLastInvoiceNumber($order_invoice->id, $this->id_shop);
+                Order::setLastInvoiceNumber($order_invoice->id, $this->id_shop);
             }
 
             // Update order_carrier

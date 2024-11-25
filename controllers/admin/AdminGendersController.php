@@ -29,6 +29,8 @@
  */
 class AdminGendersControllerCore extends AdminController
 {
+    protected $default_image_height;
+    protected $default_image_width;
     public function __construct()
     {
         $this->bootstrap = true;

@@ -30,6 +30,8 @@ class AdminModulesCatalogControllerCore extends AdminController
 
     const MODULES_PER_PAGE = 18;
 
+    protected $themes;
+
     public function __construct()
     {
         $this->bootstrap = true;
@@ -73,12 +75,13 @@ class AdminModulesCatalogControllerCore extends AdminController
             $module->element_type = self::ELEMENT_TYPE_MODULE;
             $module->logo = '../../img/questionmark.png';
 
-            if (@filemtime(_PS_ROOT_DIR_.DIRECTORY_SEPARATOR.basename(_PS_MODULE_DIR_).DIRECTORY_SEPARATOR.$module->name
-                .DIRECTORY_SEPARATOR.'logo.gif')) {
+            $logoGifPath = _PS_ROOT_DIR_.DIRECTORY_SEPARATOR.basename(_PS_MODULE_DIR_).DIRECTORY_SEPARATOR.$module->name.DIRECTORY_SEPARATOR.'logo.gif';
+            if (file_exists($logoGifPath) && @filemtime($logoGifPath)) {
                 $module->logo = 'logo.gif';
             }
-            if (@filemtime(_PS_ROOT_DIR_.DIRECTORY_SEPARATOR.basename(_PS_MODULE_DIR_).DIRECTORY_SEPARATOR.$module->name
-                .DIRECTORY_SEPARATOR.'logo.png')) {
+
+            $logoPngPath = _PS_ROOT_DIR_.DIRECTORY_SEPARATOR.basename(_PS_MODULE_DIR_).DIRECTORY_SEPARATOR.$module->name.DIRECTORY_SEPARATOR.'logo.png';
+            if (file_exists($logoPngPath) && @filemtime($logoPngPath)) {
                 $module->logo = 'logo.png';
             }
 

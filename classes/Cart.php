@@ -1055,7 +1055,7 @@ class CartCore extends ObjectModel
 
         /* If we have a product combination, the minimal quantity is set with the one of this combination */
         if (!empty($id_product_attribute)) {
-            $minimal_quantity = (int)Attribute::getAttributeMinimalQty($id_product_attribute);
+            $minimal_quantity = (int)ProductAttribute::getAttributeMinimalQty($id_product_attribute);
         } else {
             $minimal_quantity = (int)$product->minimal_quantity;
         }
@@ -1619,7 +1619,7 @@ class CartCore extends ObjectModel
         $param_product = true;
         if (is_null($products)) {
             $param_product = false;
-            $products = $this->getProducts(false, false, null, false);
+            $products = $this->getProducts(false, false, null);
         }
 
         if ($type == Cart::ONLY_PHYSICAL_PRODUCTS_WITHOUT_SHIPPING) {
@@ -2064,7 +2064,7 @@ class CartCore extends ObjectModel
             return $cache[$cache_key];
         }
 
-        $product_list = $this->getProducts($flush, false, null, true);
+        $product_list = $this->getProducts($flush, false, null);
         // Step 1 : Get product informations (warehouse_list and carrier_list), count warehouse
         // Determine the best warehouse to determine the packages
         // For that we count the number of time we can use a warehouse for a specific delivery address
@@ -4678,7 +4678,7 @@ class CartCore extends ObjectModel
         // get bookings xaml data
         $postData = trim(file_get_contents('php://input'));
         libxml_use_internal_errors(true);
-        $xml = simplexml_load_string(utf8_decode($postData));
+        $xml = simplexml_load_string(mb_convert_encoding($postData, 'ISO-8859-1'));
         $cartData = json_decode(json_encode($xml, true));
 
         $this->id_address_delivery = $cartData->cart->id_address_delivery;
@@ -4698,7 +4698,7 @@ class CartCore extends ObjectModel
         return false;
     }
 
-    public function updateWs($autodate = true, $null_values = false)
+    public function updateWs($null_values = false)
     {
         $this->id_shop = Configuration::get('PS_SHOP_DEFAULT');
         $objShop = new Shop($this->id_shop);
@@ -4707,14 +4707,14 @@ class CartCore extends ObjectModel
         // get bookings xml data
         $postData = trim(file_get_contents('php://input'));
         libxml_use_internal_errors(true);
-        $xml = simplexml_load_string(utf8_decode($postData));
+        $xml = simplexml_load_string(mb_convert_encoding($postData, 'ISO-8859-1'));
         $cartData = json_decode(json_encode($xml, true));
 
 
         $this->id_address_delivery = $cartData->cart->id_address_delivery;
         $this->id_address_invoice = $cartData->cart->id_address_invoice;
 
-        if ($this->update($autodate, $null_values)) {
+        if ($this->update($null_values)) {
             // set bookings for the cart
             $bookingRows = $cartData->cart->associations->cart_bookings->booking;
             if (isset($bookingRows->id_hotel)) {

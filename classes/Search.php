@@ -95,8 +95,8 @@ class SearchCore
 {
     public static function sanitize($string, $id_lang, $indexation = false, $iso_code = false)
     {
-        $string = trim($string);
-        if (empty($string)) {
+        // If some invalid or space, return empty string
+        if (null === $string || empty($string = trim($string))) {
             return '';
         }
 

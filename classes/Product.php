@@ -259,6 +259,13 @@ class ProductCore extends ObjectModel
     */
     public $pack_stock_type = 3;
 
+    public $productDownload;
+
+    /**
+     * @var bool|null
+     */
+    public $customization_required;
+
     public static $_taxCalculationMethod = null;
     protected static $_prices = array();
     protected static $_pricesLevel2 = array();
@@ -1202,7 +1209,7 @@ class ProductCore extends ObjectModel
         $return = Db::getInstance()->delete('category_product', 'id_product = '.(int)$this->id.' AND id_category = '.(int)$id_category);
         if ($clean_positions === true) {
             foreach ($result as $row) {
-                $this->cleanPositions((int)$row['id_category'], (int)$row['position']);
+                Product::cleanPositions((int)$row['id_category'], (int)$row['position']);
             }
         }
         SpecificPriceRule::applyAllRules(array((int)$this->id));
@@ -1228,7 +1235,7 @@ class ProductCore extends ObjectModel
         $return = Db::getInstance()->delete('category_product', 'id_product = '.(int)$this->id);
         if ($clean_positions === true && is_array($result)) {
             foreach ($result as $row) {
-                $return &= $this->cleanPositions((int)$row['id_category'], (int)$row['position']);
+                $return &= Product::cleanPositions((int)$row['id_category'], (int)$row['position']);
             }
         }
 
@@ -1585,38 +1592,6 @@ class ProductCore extends ObjectModel
         return false;
     }
 
-    /**
-     * addProductAttribute is deprecated
-     *
-     * The quantity params now set StockAvailable for the current shop with the specified quantity
-     * The supplier_reference params now set the supplier reference of the default supplier of the product if possible
-     *
-     * @see StockManager if you want to manage real stock
-     * @see StockAvailable if you want to manage available quantities for sale on your shop(s)
-     * @see ProductSupplier for manage supplier reference(s)
-     *
-     * @deprecated since 1.5.0
-     */
-    public function addProductAttribute($price, $weight, $unit_impact, $ecotax, $quantity, $id_images, $reference,
-        $id_supplier = null, $ean13, $default, $location = null, $upc = null, $minimal_quantity = 1)
-    {
-        Tools::displayAsDeprecated();
-
-        $id_product_attribute = $this->addAttribute(
-            $price, $weight, $unit_impact, $ecotax, $id_images,
-            $reference, $ean13, $default, $location, $upc, $minimal_quantity
-        );
-
-        if (!$id_product_attribute) {
-            return false;
-        }
-
-        StockAvailable::setQuantity($this->id, $id_product_attribute, $quantity);
-        //Try to set the default supplier reference
-        $this->addSupplierReference($id_supplier, $id_product_attribute);
-        return $id_product_attribute;
-    }
-
     public function generateMultipleCombinations($combinations, $attributes)
     {
         $res = true;
@@ -1755,28 +1730,6 @@ class ProductCore extends ObjectModel
         } else {
             return $result;
         }
-    }
-
-    /**
-    * Update a product attribute
-    *
-    * @deprecated since 1.5
-    * @see updateAttribute() to use instead
-    * @see ProductSupplier for manage supplier reference(s)
-    *
-    */
-    public function updateProductAttribute($id_product_attribute, $wholesale_price, $price, $weight, $unit, $ecotax,
-        $id_images, $reference, $id_supplier = null, $ean13, $default, $location = null, $upc = null, $minimal_quantity, $available_date)
-    {
-        Tools::displayAsDeprecated();
-
-        $return = $this->updateAttribute(
-            $id_product_attribute, $wholesale_price, $price, $weight, $unit, $ecotax,
-            $id_images, $reference, $ean13, $default, $location = null, $upc = null, $minimal_quantity, $available_date
-        );
-        $this->addSupplierReference($id_supplier, $id_product_attribute);
-
-        return $return;
     }
 
     /**
@@ -3700,7 +3653,7 @@ class ProductCore extends ObjectModel
             return false;
         }
 
-        if ($this->isAvailableWhenOutOfStock(StockAvailable::outOfStock($this->id))) {
+        if (Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock($this->id))) {
             return true;
         }
 
@@ -3922,7 +3875,7 @@ class ProductCore extends ObjectModel
             $row['id_product_attribute'] = Product::getDefaultAttribute((int)$row['id_product']);
         }
 
-        return $this->getProductsProperties($id_lang, $result);
+        return Product::getProductsProperties($id_lang, $result);
     }
 
     public static function getAccessoryById($accessory_id)
@@ -5741,7 +5694,7 @@ class ProductCore extends ObjectModel
     */
     public function getCoverWs()
     {
-        if ($result = $this->getCover($this->id)) {
+        if ($result = Product::getCover($this->id)) {
             return $result['id_image'];
         }
 
@@ -6023,7 +5976,7 @@ class ProductCore extends ObjectModel
             // save room type info adults, child, hotel info
             $postData = trim(file_get_contents('php://input'));
             libxml_use_internal_errors(true);
-            $xml = simplexml_load_string(utf8_decode($postData));
+            $xml = simplexml_load_string(mb_convert_encoding($postData, 'ISO-8859-1'));
 
             $roomtypeData = json_decode(json_encode($xml), true);
 

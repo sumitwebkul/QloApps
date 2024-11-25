@@ -417,7 +417,7 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
             if (isset($pos[2]) && (int) $pos[2] === $idFeatureBlock) {
                 if ($objFeatureBlock = new WkHotelFeaturesData((int) $pos[2])) {
                     if (isset($position)
-                        && $objFeatureBlock->updatePosition($way, $position, $idFeatureBlock)
+                        && $objFeatureBlock->updatePosition($way, $position)
                     ) {
                         echo 'ok position '.(int) $position.' for amenity block '.(int) $pos[1].'\r\n';
                     } else {

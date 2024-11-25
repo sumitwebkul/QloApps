@@ -231,7 +231,7 @@ class AdminFooterPaymentBlockSettingController extends ModuleAdminController
             if (isset($pos[2]) && (int) $pos[2] === $idPaymentBlock) {
                 if ($objPaymentBlockInfo = new WkFooterPaymentBlockInfo((int) $pos[2])) {
                     if (isset($position)
-                        && $objPaymentBlockInfo->updatePosition($way, $position, $idPaymentBlock)
+                        && $objPaymentBlockInfo->updatePosition($way, $position)
                     ) {
                         echo 'ok position '.(int) $position.' for payment block '.(int) $pos[1].'\r\n';
                     } else {

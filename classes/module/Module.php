@@ -66,6 +66,12 @@ abstract class ModuleCore
     /** @var string Module key provided by addons.prestashop.com */
     public $module_key = '';
 
+    /** @var bool Set to true to enable bootstrap theme on configuration page */
+    public $bootstrap = false;
+
+    /** @var string Text to display when ask for confirmation on uninstall action */
+    public $confirmUninstall = '';
+
     public $description_full;
 
     public $additional_description;
@@ -80,6 +86,9 @@ abstract class ModuleCore
 
     /** @var int need_instance */
     public $need_instance = 1;
+
+    /** @var int */
+    public $is_configurable = 0;
 
     /** @var string Admin tab corresponding to the module */
     public $tab = null;
@@ -161,6 +170,9 @@ abstract class ModuleCore
     public $allow_push;
 
     public $push_time_limit = 180;
+
+    /** @var bool Define if we will populate data during installation */
+    public $populateData = 0;
 
     /** @var bool Define if we will log modules performances for this session */
     public static $_log_modules_perfs = null;
@@ -1440,7 +1452,7 @@ abstract class ModuleCore
                     $item->version = $tmp_module->version;
                     $item->tab = $tmp_module->tab;
                     $item->displayName = $tmp_module->displayName;
-                    $item->description = stripslashes($tmp_module->description);
+                    $item->description = isset($tmp_module->description) ? stripslashes($tmp_module->description) : null;
                     $item->author = $tmp_module->author;
                     $item->author_uri = (isset($tmp_module->author_uri) && $tmp_module->author_uri) ? $tmp_module->author_uri : false;
                     $item->limited_countries = $tmp_module->limited_countries;
@@ -1452,7 +1464,7 @@ abstract class ModuleCore
                     $item->currencies = isset($tmp_module->currencies) ? $tmp_module->currencies : null;
                     $item->currencies_mode = isset($tmp_module->currencies_mode) ? $tmp_module->currencies_mode : null;
                     $item->confirmUninstall = isset($tmp_module->confirmUninstall) ? html_entity_decode($tmp_module->confirmUninstall) : null;
-                    $item->description_full = stripslashes($tmp_module->description_full);
+                    $item->description_full = isset($tmp_module->description_full) ? stripslashes($tmp_module->description_full) : null;
                     $item->additional_description = isset($tmp_module->additional_description) ? stripslashes($tmp_module->additional_description) : null;
                     $item->compatibility = isset($tmp_module->compatibility) ? (array)$tmp_module->compatibility : null;
                     $item->nb_rates = isset($tmp_module->nb_rates) ? (array)$tmp_module->nb_rates : null;

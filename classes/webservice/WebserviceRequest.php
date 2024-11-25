@@ -868,7 +868,7 @@ class WebserviceRequestCore
      */
     protected function checkResource()
     {
-        $this->resourceList = $this->getResources();
+        $this->resourceList = WebserviceRequest::getResources();
         $resourceNames = array_keys($this->resourceList);
         if ($this->urlSegment[0] == '') {
             $this->resourceConfiguration['objectsNodeName'] = 'resources';

@@ -132,6 +132,7 @@ class HotelBranchInformation extends ObjectModel
         ),
     );
 
+    public $moduleInstance;
     public function __construct($id = null, $id_lang = null, $id_shop = null)
     {
         $this->moduleInstance = Module::getInstanceByName('hotelreservationsystem');
@@ -139,7 +140,7 @@ class HotelBranchInformation extends ObjectModel
 
         $this->id_country = $this->id_state = $this->city = $this->zipcode = $this->address = $this->phone = null;
         if ($id) {
-            if ($hotelAddress = $this->getAddress($id)) {
+            if ($hotelAddress = self::getAddress($id)) {
                 $this->id_country = $hotelAddress['id_country'];
                 $this->id_state = $hotelAddress['id_state'];
                 $this->city = $hotelAddress['city'];
@@ -650,21 +651,73 @@ class HotelBranchInformation extends ObjectModel
         return $return;
     }
 
-    public function addCategory($name, $parent_cat = false, $group_ids, $ishotel = false, $idHotel = false, $link_rewrite = false, $meta_title = false, $meta_description = false, $meta_keywords = false)
+    public function getCategoryParams($params)
     {
-        $context = Context::getContext();
-        if (!$parent_cat) {
-            $parent_cat = Configuration::get('PS_LOCATIONS_CATEGORY');
+        if (!isset($params['parent_category'])) {
+            $params['parent_category'] = false;
         }
+
+        if (!isset($params['is_hotel'])) {
+            $params['is_hotel'] = false;
+        }
+
+        if (!isset($params['id_hotel'])) {
+            $params['id_hotel'] = 0;
+        }
+
+        if (!isset($params['link_rewrite'])) {
+            $params['link_rewrite'] = false;
+        }
+
+        if (!isset($params['meta_title'])) {
+            $params['meta_title'] = false;
+        }
+
+        if (!isset($params['meta_description'])) {
+            $params['meta_description'] = false;
+        }
+
+        if (!isset($params['meta_keywords'])) {
+            $params['meta_keywords'] = false;
+        }
+
+        return $params;
+    }
+
+    /**
+     * Send parameters in array form
+     * @param array $params
+     *  $params['name']: [name of the category]
+     *  $params['group_ids']: [group_ids of the category]
+     *  $params['parent_category']: [parent_category of the category]
+     *  $params['is_hotel']: [is_hotel = 1 if category is for hotel]
+     *  $params['id_hotel']: [id_hotel of the category, if category is for hotel]
+     *  $params['link_rewrite']: [link_rewrite of the category]
+     *  $params['meta_title']: [meta_title of the category]
+     *  $params['meta_description']: [meta_description of the category]
+     *  $params['meta_keywords']: [meta_keywords of the category]
+     * @return void
+     */
+    public function addCategory(array $params)
+    {
+        extract($this->getCategoryParams($params));
+
+        $context = Context::getContext();
+
+        if (!$parent_category) {
+            $parent_category = Configuration::get('PS_LOCATIONS_CATEGORY');
+        }
+
         if (is_array($name) && isset($name[Configuration::get('PS_LANG_DEFAULT')])) {
             $catName = $name[Configuration::get('PS_LANG_DEFAULT')];
         } else {
             $catName = $name;
         }
+
         if ($categoryExists = Category::searchByNameAndParentCategoryId(
             Configuration::get('PS_LANG_DEFAULT'),
             $catName,
-            $parent_cat
+            $parent_category
         )) {
             if (is_array($link_rewrite)) {
                 $objCategory = new Category($categoryExists['id_category']);
@@ -695,8 +748,10 @@ class HotelBranchInformation extends ObjectModel
                     $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
                 }
             }
-            $category->id_parent = $parent_cat;
+
+            $category->id_parent = $parent_category;
             $category->groupBox = $group_ids;
+
             if ($meta_title) {
                 $category->meta_title = $meta_title;
             }
@@ -706,6 +761,7 @@ class HotelBranchInformation extends ObjectModel
             if ($meta_keywords) {
                 $category->meta_keywords = $meta_keywords;
             }
+
             $category->add();
             return $category->id;
         }
@@ -1217,20 +1273,51 @@ class HotelBranchInformation extends ObjectModel
                 $linkRewriteArray[$lang['id_lang']] = Tools::link_rewrite($this->hotel_name[$lang['id_lang']]);
             }
 
-            if ($catCountry = $this->addCategory($countryName, false, $groupIds)) {
+            if ($catCountry = $this->addCategory(
+                array (
+                    'name' => $countryName,
+                    'group_ids' => $groupIds,
+                    'parent_category' => false
+                )
+            )) {
                 if ($this->id_state) {
                     $objState = new State();
                     $stateName = $objState->getNameById($this->id_state);
 
-                    $catState = $this->addCategory($stateName, $catCountry, $groupIds);
+                    $catState = $this->addCategory(
+                        array (
+                            'name' => $stateName,
+                            'group_ids' => $groupIds,
+                            'parent_category' => $catCountry
+                        )
+                    );
                 } else {
-                    $catState = $this->addCategory($this->city, $catCountry, $groupIds);
+                    $catState = $this->addCategory(
+                        array (
+                            'name' => $this->city,
+                            'group_ids' => $groupIds,
+                            'parent_category' => $catCountry
+                        )
+                    );
                 }
                 if ($catState) {
-                    if ($catCity = $this->addCategory($this->city, $catState, $groupIds)) {
+                    if ($catCity = $this->addCategory(
+                        array (
+                            'name' => $this->city,
+                            'group_ids' => $groupIds,
+                            'parent_category' => $catState
+                        )
+                    )) {
                         $hotelCatName = $this->hotel_name[Configuration::get('PS_LANG_DEFAULT')];
                         if ($catHotel = $this->addCategory(
-                            $hotelCatName, $catCity, $groupIds, 1, $this->id, $linkRewriteArray
+                            array (
+                                'name' => $hotelCatName,
+                                'group_ids' => $groupIds,
+                                'parent_category' => $catCity,
+                                'is_hotel' => 1,
+                                'id_hotel' => $this->id,
+                                'link_rewrite' => $linkRewriteArray
+                            )
                         )) {
                             $this->id_category = $catHotel;
                             $this->save();

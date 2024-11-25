@@ -40,6 +40,7 @@ class ParentOrderControllerCore extends FrontController
     public $php_self = 'order';
 
     public $nbProducts;
+    public $link_conditions;
 
     /**
      * Initialize parent order controller

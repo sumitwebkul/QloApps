@@ -378,7 +378,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
             if (isset($pos[2]) && (int) $pos[2] === $idTestimonialBlock) {
                 if ($objTestimonialBlock = new WkHotelTestimonialData((int) $pos[2])) {
                     if (isset($position)
-                        && $objTestimonialBlock->updatePosition($way, $position, $idTestimonialBlock)
+                        && $objTestimonialBlock->updatePosition($way, $position)
                     ) {
                         echo 'ok position '.(int) $position.' for testimonial block '.(int) $pos[1].'\r\n';
                     } else {

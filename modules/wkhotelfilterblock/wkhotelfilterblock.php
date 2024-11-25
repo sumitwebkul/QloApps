@@ -111,7 +111,6 @@ class wkhotelfilterblock extends Module
         $helper->table = $this->table;
         $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
         $helper->default_form_language = $lang->id;
-        $this->fields_form = array();
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'btnConfigSubmit';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).

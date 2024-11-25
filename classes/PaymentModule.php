@@ -30,6 +30,7 @@ abstract class PaymentModuleCore extends Module
 
     /** @var int Current order's id */
     public $currentOrder;
+    public $currentOrderReference;
     public $currencies = true;
     public $currencies_mode = 'checkbox';
     public $payment_type = OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT;

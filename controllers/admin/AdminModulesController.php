@@ -147,10 +147,10 @@ class AdminModulesControllerCore extends AdminController
     public function checkCategoriesNames($a, $b)
     {
         if ($a['name'] === $this->l('Other Modules')) {
-            return true;
+            return 1;
         }
 
-        return (bool)($a['name'] > $b['name']);
+        return ($a['name'] > $b['name']) ? 1 : 0;
     }
 
     public function setMedia()

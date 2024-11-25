@@ -30,6 +30,13 @@ if (!defined('_PS_VERSION_')) {
 
 class Blocknewsletter extends Module
 {
+    public $secure_key;
+    protected $hookPrepared = false;
+    protected $_html;
+    protected $_files;
+    protected $valid;
+    protected $error;
+
     const GUEST_NOT_REGISTERED = -1;
     const CUSTOMER_NOT_REGISTERED = 0;
     const GUEST_REGISTERED = 1;
@@ -748,7 +755,7 @@ class Blocknewsletter extends Module
         if (!$this->uninstall(false)) {
             return false;
         }
-        if (!$this->install(false)) {
+        if (!$this->install()) {
             return false;
         }
 

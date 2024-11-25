@@ -74,7 +74,7 @@ class CMSCore extends ObjectModel
     public function update($null_values = false)
     {
         if (parent::update($null_values)) {
-            return $this->cleanPositions($this->id_cms_category);
+            return CMS::cleanPositions($this->id_cms_category);
         }
         return false;
     }
@@ -82,7 +82,7 @@ class CMSCore extends ObjectModel
     public function delete()
     {
         if (parent::delete()) {
-            return $this->cleanPositions($this->id_cms_category);
+            return CMS::cleanPositions($this->id_cms_category);
         }
         return false;
     }
