@@ -27,7 +27,8 @@
 /**
  * @since 1.5
  */
-abstract class HTMLTemplateCore
+#[\AllowDynamicProperties]
+ abstract class HTMLTemplateCore
 {
     public $title;
     public $date;

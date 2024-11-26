@@ -778,7 +778,6 @@ class ProductControllerCore extends FrontController
             $smartyVars['occupancies'] = $occupancy;
             $smartyVars['occupancy_adults'] = array_sum(array_column($occupancy, 'adults'));
             $smartyVars['occupancy_children'] = array_sum(array_column($occupancy, 'children'));
-            $smartyVars['occupancy_child_ages'] = array_sum(array_column($occupancy, 'child_ages'));
         }
 
         $smartyVars['hotel_location'] = $hotelLocation;

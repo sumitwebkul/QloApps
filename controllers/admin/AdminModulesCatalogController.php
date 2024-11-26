@@ -257,7 +257,7 @@ class AdminModulesCatalogControllerCore extends AdminController
         if ($criteria != 'popularity') {
             usort($list, function($a, $b) use($criteria){
                 if ($criteria == 'name') {
-                    return strnatcasecmp($a->displayName, $b->displayName);
+                    return (strnatcasecmp($a->displayName, $b->displayName)) ? 1 : 0;
                 } else if ($criteria == 'price_increasing') {
                     $priceA = $priceB = 0;
                     if (isset($a->price)) {
@@ -266,7 +266,7 @@ class AdminModulesCatalogControllerCore extends AdminController
                     if (isset($b->price)) {
                         $priceB = $b->price;
                     }
-                    return $priceA > $priceB;
+                    return ($priceA > $priceB) ? 1 : 0;;
                 } else if ($criteria == 'price_decreasing') {
                     $priceA = $priceB = 0;
                     if (isset($a->price)) {
@@ -275,7 +275,7 @@ class AdminModulesCatalogControllerCore extends AdminController
                     if (isset($b->price)) {
                         $priceB = $b->price;
                     }
-                    return $priceA < $priceB;
+                    return ($priceA < $priceB) ? 1 : 0;;
                 }
 
             });

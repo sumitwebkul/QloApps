@@ -6578,7 +6578,9 @@ class AdminOrdersControllerCore extends AdminController
                     $this->context->currency = new Currency($objOrder->id_currency);
 
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                    $qty = Tools::getValue('service_qty');
+                    if (!$qty = Tools::getValue('service_qty')) {
+                        $qty = array();
+                    }
                     $price = Tools::getValue('service_price');
                     foreach ($selectedServices as $key => $service) {
                         if ($objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($objHotelBookingDetail->id_product, $service)) {
@@ -6774,7 +6776,7 @@ class AdminOrdersControllerCore extends AdminController
 
                             // Save changes of order
                             $order->update();
-                            if (Validate::isLoadedObject($specific_price)) {
+                            if (isset($specific_price) && Validate::isLoadedObject($specific_price)) {
                                 $specific_price->delete();
                                 unset($specific_price);
                             }

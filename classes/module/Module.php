@@ -24,6 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+#[\AllowDynamicProperties]
 abstract class ModuleCore
 {
     /** @var int Module ID */

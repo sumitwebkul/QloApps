@@ -1257,7 +1257,10 @@ class AdminModulesControllerCore extends AdminController
 
             // Filter on module category
             $category_filtered = array();
-            $filter_categories = explode('|', Configuration::get('PS_SHOW_CAT_MODULES_'.(int)$this->id_employee));
+            $filter_categories = array();
+            if (Configuration::get('PS_SHOW_CAT_MODULES_'.(int)$this->id_employee)) {
+                $filter_categories = explode('|', Configuration::get('PS_SHOW_CAT_MODULES_'.(int)$this->id_employee));
+            }
             if (count($filter_categories) > 0) {
                 foreach ($filter_categories as $fc) {
                     if (!empty($fc)) {
@@ -1405,7 +1408,10 @@ class AdminModulesControllerCore extends AdminController
         $smarty = $this->context->smarty;
         $autocomplete_list = 'var moduleList = [';
         $category_filtered = array();
-        $filter_categories = explode('|', Configuration::get('PS_SHOW_CAT_MODULES_'.(int)$this->id_employee));
+        $filter_categories = array();
+        if (Configuration::get('PS_SHOW_CAT_MODULES_'.(int)$this->id_employee)) {
+            $filter_categories = explode('|', Configuration::get('PS_SHOW_CAT_MODULES_'.(int)$this->id_employee));
+        }
         if (count($filter_categories) > 0) {
             foreach ($filter_categories as $fc) {
                 if (!empty($fc)) {

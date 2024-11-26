@@ -29,6 +29,7 @@
  *
  * @since 1.5.0.1
  */
+#[\AllowDynamicProperties]
 class ContextCore
 {
     /* @var Context */

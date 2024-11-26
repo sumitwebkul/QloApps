@@ -24,6 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+#[\AllowDynamicProperties]
 class WebserviceRequestCore
 {
     const HTTP_GET = 1;

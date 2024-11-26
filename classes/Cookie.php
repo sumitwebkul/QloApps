@@ -24,6 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+#[\AllowDynamicProperties]
 class CookieCore
 {
     const SAMESITE_NONE = 'None';

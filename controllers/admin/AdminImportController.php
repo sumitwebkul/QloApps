@@ -1079,7 +1079,7 @@ class AdminImportControllerCore extends AdminController
                 ) {
                     $cat_moved[$category->id] = (int) $category_already_created['id_category'];
                     $category->id = (int)$category_already_created['id_category'];
-                    if (Validate::isDate($category_already_created['date_add'])) {
+                    if ($category_already_created['date_add'] && Validate::isDate($category_already_created['date_add'])) {
                         $category->date_add = $category_already_created['date_add'];
                     }
                 }

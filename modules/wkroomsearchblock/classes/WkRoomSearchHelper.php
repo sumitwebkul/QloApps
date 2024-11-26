@@ -213,9 +213,6 @@ class WkRoomSearchHelper
                                 $searchedData['occupancy_children'] = array_sum(
                                     array_column($searchedData['occupancies'], 'children')
                                 );
-                                $searchedData['occupancy_child_ages'] = array_sum(
-                                    array_column($searchedData['occupancies'], 'child_ages')
-                                );
                             }
                         }
                     }

@@ -110,7 +110,7 @@ class Minify_HTML
         $this->_html = preg_replace_callback(
             '/(\\s*)<script(\\b[^>]*?>)([\\s\\S]*?)<\\/script>(\\s*)/iu',
             array($this, '_removeScriptCB'),
-            $this->_html,
+            is_null($this->_html) ? '' : $this->_html,
             Media::getBackTrackLimit()
         );
 
@@ -118,7 +118,7 @@ class Minify_HTML
         $this->_html = preg_replace_callback(
             '/\\s*<style(\\b[^>]*>)([\\s\\S]*?)<\\/style>\\s*/iu',
             array($this, '_removeStyleCB'),
-            $this->_html,
+            is_null($this->_html) ? '' : $this->_html,
             Media::getBackTrackLimit()
         );
 
@@ -126,7 +126,7 @@ class Minify_HTML
         $this->_html = preg_replace_callback(
             '/<!--([\\s\\S]*?)-->/u',
             array($this, '_commentCB'),
-            $this->_html,
+            is_null($this->_html) ? '' : $this->_html,
             Media::getBackTrackLimit()
         );
 
@@ -134,7 +134,7 @@ class Minify_HTML
         $this->_html = preg_replace_callback(
             '/\\s*<pre(\\b[^>]*?>[\\s\\S]*?<\\/pre>)\\s*/iu',
             array($this, '_removePreCB'),
-            $this->_html,
+            is_null($this->_html) ? '' : $this->_html,
             Media::getBackTrackLimit()
         );
 
@@ -142,7 +142,7 @@ class Minify_HTML
         $this->_html = preg_replace_callback(
             '/\\s*<textarea(\\b[^>]*?>[\\s\\S]*?<\\/textarea>)\\s*/iu',
             array($this, '_removeTextareaCB'),
-            $this->_html,
+            is_null($this->_html) ? '' : $this->_html,
             Media::getBackTrackLimit()
         );
 

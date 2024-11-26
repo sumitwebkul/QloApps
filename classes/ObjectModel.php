@@ -24,6 +24,7 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+#[\AllowDynamicProperties]
 abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterface
 {
     /**

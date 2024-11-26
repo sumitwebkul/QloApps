@@ -70,7 +70,7 @@
 								<td>
 									<div class="input-group">
 										<span class="input-group-addon">{$currencySign}</span>
-										<input type="text" class="form-control unit_price" value="{Tools::ps_round($service['unit_price_tax_excl'], 2)}" data-id-product="{$product['id_product']}">
+										<input type="text" class="form-control unit_price" value="{Tools::ps_round($service['unit_price_tax_excl'], 2)}" data-id-product="{$service['id_product']}">
 										{if Product::PRICE_CALCULATION_METHOD_PER_DAY == $service.product_price_calculation_method}
 											<span class="input-group-addon">{l s='/ night'}</span>
 										{/if}

@@ -34,8 +34,8 @@ class Blocknewsletter extends Module
     protected $hookPrepared = false;
     protected $_html;
     protected $_files;
-    protected $valid;
-    protected $error;
+    public $valid;
+    public $error;
 
     const GUEST_NOT_REGISTERED = -1;
     const CUSTOMER_NOT_REGISTERED = 0;
