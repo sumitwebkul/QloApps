@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Įdiekite „Addons“ modulius',
 		'Install theme' => 'Įdiegti temą',
 		'Required PHP parameters' => 'Reikalingi PHP parametrai',
-		'The required PHP version is between 8.0 to 8.3' => 'Reikalinga PHP versija yra nuo 5.6 iki 7.4',
+		'The required PHP version is between 8.0 to 8.4.1' => 'Reikalinga PHP versija yra nuo 8.0 iki 8.4.1',
 		'Cannot upload files' => 'Nepavyksta įkelti failų',
 		'Cannot create new files and folders' => 'Negalima sukurti naujų failų ir aplankų',
 		'GD library is not installed' => 'GD biblioteka neįdiegta',

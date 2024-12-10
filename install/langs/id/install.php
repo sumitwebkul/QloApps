@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Instal modul Addons',
 		'Install theme' => 'Instal tema',
 		'Required PHP parameters' => 'Parameter PHP yang diperlukan',
-		'The required PHP version is between 8.0 to 8.3' => 'Versi PHP yang diperlukan adalah antara 5.6 hingga 7.4',
+		'The required PHP version is between 8.0 to 8.4.1' => 'Versi PHP yang diperlukan adalah antara 8.0 hingga 8.4.1',
 		'Cannot upload files' => 'Tidak dapat mengunggah file',
 		'Cannot create new files and folders' => 'Tidak dapat membuat file dan folder baru',
 		'GD library is not installed' => 'Perpustakaan GD tidak diinstal',
