@@ -4479,8 +4479,10 @@ class AdminControllerCore extends Controller
 
         $is_reset_ready = false;
         if (Validate::isModuleName($module->name)) {
-            if (method_exists(Module::getInstanceByName($module->name), 'reset')) {
-                $is_reset_ready = true;
+            if (Validate::isLoadedObject($moduleObj = Module::getInstanceByName($module->name))) {
+                if (method_exists($moduleObj, 'reset')) {
+                    $is_reset_ready = true;
+                }
             }
         }
 

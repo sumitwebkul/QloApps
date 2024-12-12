@@ -3264,7 +3264,7 @@ class AdminOrdersControllerCore extends AdminController
 
             $objHotelBookingDocument = new HotelBookingDocument();
             $objHotelBookingDocument->setFileInfoForUploadedDocument('booking_document');
-            if (!count($objHotelBookingDocument->fileInfo)) {
+            if (!$objHotelBookingDocument->fileInfo || !count($objHotelBookingDocument->fileInfo)) {
                 $this->errors[] = $this->l('Please select a file to upload.');
             } elseif ($objHotelBookingDocument->fileInfo['size'] > Tools::getMaxUploadSize()) {
                 $this->errors[] = $this->l('Uploaded file size is too large.');
