@@ -121,7 +121,7 @@ class TabCore extends ObjectModel
      * @param Context $context
      * @return bool true if succeed
      */
-    public static function initAccess($id_tab, Context $context = null)
+    public static function initAccess($id_tab, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();

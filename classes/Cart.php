@@ -1027,7 +1027,7 @@ class CartCore extends ObjectModel
      * @param string $operator Indicate if quantity must be increased or decreased
      */
     public function updateQty($quantity, $id_product, $id_product_attribute = null, $id_customization = false,
-        $operator = 'up', $id_address_delivery = 0, Shop $shop = null, $auto_add_cart_rule = true)
+        $operator = 'up', $id_address_delivery = 0, ?Shop $shop = null, $auto_add_cart_rule = true)
     {
         if (!$shop) {
             $shop = Context::getContext()->shop;
@@ -2527,7 +2527,7 @@ class CartCore extends ObjectModel
      *               );
      *               If there are no carriers available for an address, return an empty  array
      */
-    public function getDeliveryOptionList(Country $default_country = null, $flush = false)
+    public function getDeliveryOptionList(?Country $default_country = null, $flush = false)
     {
         static $cache = array();
         if (isset($cache[$this->id]) && !$flush) {
@@ -2863,7 +2863,7 @@ class CartCore extends ObjectModel
      * @param bool $flush Force flushing cache
      *
      */
-    public function simulateCarriersOutput(Country $default_country = null, $flush = false)
+    public function simulateCarriersOutput(?Country $default_country = null, $flush = false)
     {
         $delivery_option_list = $this->getDeliveryOptionList($default_country, $flush);
 
@@ -3143,7 +3143,7 @@ class CartCore extends ObjectModel
     * @param Country|null $default_country
     * @return float Shipping total
     */
-    public function getTotalShippingCost($delivery_option = null, $use_tax = true, Country $default_country = null)
+    public function getTotalShippingCost($delivery_option = null, $use_tax = true, ?Country $default_country = null)
     {
         if (isset(Context::getContext()->cookie->id_country)) {
             $default_country = new Country(Context::getContext()->cookie->id_country);
@@ -3178,7 +3178,7 @@ class CartCore extends ObjectModel
      * @param array|null $delivery_option
      * @return float Shipping total
      */
-    public function getCarrierCost($id_carrier, $useTax = true, Country $default_country = null, $delivery_option = null)
+    public function getCarrierCost($id_carrier, $useTax = true, ?Country $default_country = null, $delivery_option = null)
     {
         if (is_null($delivery_option)) {
             $delivery_option = $this->getDeliveryOption($default_country);
@@ -3207,7 +3207,7 @@ class CartCore extends ObjectModel
     /**
      * @deprecated 1.5.0, use Cart->getPackageShippingCost()
      */
-    public function getOrderShippingCost($id_carrier = null, $use_tax = true, Country $default_country = null, $product_list = null)
+    public function getOrderShippingCost($id_carrier = null, $use_tax = true, ?Country $default_country = null, $product_list = null)
     {
         Tools::displayAsDeprecated();
         return $this->getPackageShippingCost((int)$id_carrier, $use_tax, $default_country, $product_list);
@@ -3225,7 +3225,7 @@ class CartCore extends ObjectModel
      *
      * @return float Shipping total
      */
-    public function getPackageShippingCost($id_carrier = null, $use_tax = true, Country $default_country = null, $product_list = null, $id_zone = null)
+    public function getPackageShippingCost($id_carrier = null, $use_tax = true, ?Country $default_country = null, $product_list = null, $id_zone = null)
     {
         if ($this->isVirtualCart()) {
             return 0;

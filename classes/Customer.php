@@ -826,7 +826,7 @@ class CustomerCore extends ObjectModel
         return self::$_defaultGroupId[(int)$id_customer];
     }
 
-    public static function getCurrentCountry($id_customer, Cart $cart = null)
+    public static function getCurrentCountry($id_customer, ?Cart $cart = null)
     {
         if (!$cart) {
             $cart = Context::getContext()->cart;

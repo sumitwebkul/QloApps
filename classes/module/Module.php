@@ -251,7 +251,7 @@ abstract class ModuleCore
      * @param string $name Module unique name
      * @param Context $context
      */
-    public function __construct($name = null, Context $context = null)
+    public function __construct($name = null, ?Context $context = null)
     {
         // for Prestashop version compliancy
         if (isset($this->ps_versions_compliancy) && !isset($this->ps_versions_compliancy['min'])) {

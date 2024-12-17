@@ -170,7 +170,7 @@ class SearchCore
     }
 
     public static function find($id_lang, $expr, $page_number = 1, $page_size = 1, $order_by = 'position',
-        $order_way = 'desc', $ajax = false, $use_cookie = true, Context $context = null)
+        $order_way = 'desc', $ajax = false, $use_cookie = true, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -767,7 +767,7 @@ class SearchCore
     }
 
     public static function searchTag($id_lang, $tag, $count = false, $pageNumber = 0, $pageSize = 10, $orderBy = false, $orderWay = false,
-            $useCookie = true, Context $context = null)
+            $useCookie = true, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();

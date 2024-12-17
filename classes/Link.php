@@ -511,7 +511,7 @@ class LinkCore
      * @param int $id_lang Language ID
      * @return string link
      */
-    public function getLanguageLink($id_lang, Context $context = null)
+    public function getLanguageLink($id_lang, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -644,7 +644,7 @@ class LinkCore
         return $url.(!strstr($url, '?') ? '?' : '&').'orderby='.urlencode($orderby).'&orderway='.urlencode($orderway);
     }
 
-    protected function getLangLink($id_lang = null, Context $context = null, $id_shop = null)
+    protected function getLangLink($id_lang = null, ?Context $context = null, $id_shop = null)
     {
         if (!$context) {
             $context = Context::getContext();

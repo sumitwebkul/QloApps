@@ -979,7 +979,7 @@ class OrderCore extends ObjectModel
      * @param bool $skip_id_address_invoice Skip orders from this id_address_invoice
      * @return array Customer orders
      */
-    public static function getCustomerOrders($id_customer, $show_hidden_status = false, Context $context = null, $id_address_invoice = null, $skip_address = 0)
+    public static function getCustomerOrders($id_customer, $show_hidden_status = false, ?Context $context = null, $id_address_invoice = null, $skip_address = 0)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -1038,7 +1038,7 @@ class OrderCore extends ObjectModel
         return $orders;
     }
 
-    public static function getOrdersWithInformations($limit = null, Context $context = null)
+    public static function getOrdersWithInformations($limit = null, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();

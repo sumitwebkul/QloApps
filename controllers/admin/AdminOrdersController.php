@@ -4695,7 +4695,7 @@ class AdminOrdersControllerCore extends AdminController
     /**
      * This function is called when order is changed (Add/Edit/Delete room on order)
      */
-    public function sendChangedNotification(Order $order = null)
+    public function sendChangedNotification(?Order $order = null)
     {
         if (is_null($order)) {
             $order = new Order(Tools::getValue('id_order'));
@@ -5718,7 +5718,7 @@ class AdminOrdersControllerCore extends AdminController
         )));
     }
 
-    protected function doEditProductValidation(OrderDetail $order_detail, Order $order, OrderInvoice $order_invoice = null)
+    protected function doEditProductValidation(OrderDetail $order_detail, Order $order, ?OrderInvoice $order_invoice = null)
     {
         $this->doEditValidation($order_detail, $order, $order_invoice);
 
@@ -5752,7 +5752,7 @@ class AdminOrdersControllerCore extends AdminController
      * @param OrderInvoice $order_invoice
      * @return bool
      */
-    protected function doEditRoomValidation(OrderDetail $order_detail, Order $order, OrderInvoice $order_invoice = null)
+    protected function doEditRoomValidation(OrderDetail $order_detail, Order $order, ?OrderInvoice $order_invoice = null)
     {
         $this->doEditValidation($order_detail, $order, $order_invoice);
 
@@ -5931,7 +5931,7 @@ class AdminOrdersControllerCore extends AdminController
         }
     }
 
-    protected function doEditValidation(OrderDetail $order_detail, Order $order, OrderInvoice $order_invoice = null)
+    protected function doEditValidation(OrderDetail $order_detail, Order $order, ?OrderInvoice $order_invoice = null)
     {
         if (!Validate::isLoadedObject($order_detail)) {
             die(json_encode(array(

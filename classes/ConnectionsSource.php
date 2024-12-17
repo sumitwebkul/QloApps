@@ -56,7 +56,7 @@ class ConnectionsSourceCore extends ObjectModel
         return $result;
     }
 
-    public static function logHttpReferer(Cookie $cookie = null)
+    public static function logHttpReferer(?Cookie $cookie = null)
     {
         if (!$cookie) {
             $cookie = Context::getContext()->cookie;

@@ -173,7 +173,7 @@ class HotelBranchInformation extends ObjectModel
      * @param Context $context
      * @return bool true if succeed
      */
-    protected function initAccess($idHotel, Context $context = null)
+    protected function initAccess($idHotel, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();

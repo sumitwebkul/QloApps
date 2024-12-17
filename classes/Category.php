@@ -701,7 +701,7 @@ class CategoryCore extends ObjectModel
      * @return array|int|false Products, number of products or false (no access)
      * @throws PrestaShopDatabaseException
      */
-    public function getProducts($id_lang, $p, $n, $order_by = null, $order_way = null, $get_total = false, $active = true, $random = false, $random_number_products = 1, $check_access = true, Context $context = null)
+    public function getProducts($id_lang, $p, $n, $order_by = null, $order_way = null, $get_total = false, $active = true, $random = false, $random_number_products = 1, $check_access = true, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -821,7 +821,7 @@ class CategoryCore extends ObjectModel
         return self::getChildren(Configuration::get('PS_HOME_CATEGORY'), $id_lang, $active, $id_shop);
     }
 
-    public static function getRootCategory($id_lang = null, Shop $shop = null)
+    public static function getRootCategory($id_lang = null, ?Shop $shop = null)
     {
         $context = Context::getContext();
         if (is_null($id_lang)) {
@@ -968,7 +968,7 @@ class CategoryCore extends ObjectModel
      * @param int $id_lang
      * @return array
      */
-    public static function getChildrenWithNbSelectedSubCat($id_parent, $selected_cat, $id_lang, Shop $shop = null, $use_shop_context = true)
+    public static function getChildrenWithNbSelectedSubCat($id_parent, $selected_cat, $id_lang, ?Shop $shop = null, $use_shop_context = true)
     {
         if (!$shop) {
             $shop = Context::getContext()->shop;
@@ -1088,7 +1088,7 @@ class CategoryCore extends ObjectModel
         return self::$_links[$id_category.'-'.$id_lang];
     }
 
-    public function getLink(Link $link = null, $id_lang = null)
+    public function getLink(?Link $link = null, $id_lang = null)
     {
         if (!$link) {
             $link = Context::getContext()->link;
@@ -1562,7 +1562,7 @@ class CategoryCore extends ObjectModel
      * @param Shop $shop
      * @return bool
      */
-    public function inShop(Shop $shop = null)
+    public function inShop(?Shop $shop = null)
     {
         if (!$shop) {
             $shop = Context::getContext()->shop;
@@ -1574,7 +1574,7 @@ class CategoryCore extends ObjectModel
         return ($this->nleft >= $interval['nleft'] && $this->nright <= $interval['nright']);
     }
 
-    public static function inShopStatic($id_category, Shop $shop = null)
+    public static function inShopStatic($id_category, ?Shop $shop = null)
     {
         if (!$shop || !is_object($shop)) {
             $shop = Context::getContext()->shop;

@@ -87,7 +87,7 @@ class CMSCore extends ObjectModel
         return false;
     }
 
-    public static function getLinks($id_lang, $selection = null, $active = true, Link $link = null)
+    public static function getLinks($id_lang, $selection = null, $active = true, ?Link $link = null)
     {
         if (!$link) {
             $link = Context::getContext()->link;

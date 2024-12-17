@@ -426,7 +426,7 @@ class MetaCore extends ObjectModel
     /**
      * @since 1.5.0
      */
-    public static function completeMetaTags($meta_tags, $default_value, Context $context = null)
+    public static function completeMetaTags($meta_tags, $default_value, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();

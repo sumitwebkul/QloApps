@@ -567,7 +567,7 @@ class ProductCore extends ObjectModel
     const PRICE_CALCULATION_METHOD_PER_DAY = 2;
 
 
-    public function __construct($id_product = null, $full = false, $id_lang = null, $id_shop = null, Context $context = null)
+    public function __construct($id_product = null, $full = false, $id_lang = null, $id_shop = null, ?Context $context = null)
     {
         parent::__construct($id_product, $id_lang, $id_shop);
         if ($full && $this->id) {
@@ -1304,7 +1304,7 @@ class ProductCore extends ObjectModel
     * @return array Products details
     */
     public static function getProducts($id_lang, $start, $limit, $order_by, $order_way, $id_category = false,
-        $only_active = false, Context $context = null)
+        $only_active = false, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -1356,7 +1356,7 @@ class ProductCore extends ObjectModel
         return ($rq);
     }
 
-    public static function getSimpleProducts($id_lang, Context $context = null)
+    public static function getSimpleProducts($id_lang, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -1378,7 +1378,7 @@ class ProductCore extends ObjectModel
     }
 
 
-    public function getProductServiceProducts($id_lang, $p, $n, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $get_total = false, $active = true, $sub_category = false, Context $context = null)
+    public function getProductServiceProducts($id_lang, $p, $n, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $get_total = false, $active = true, $sub_category = false, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -1465,7 +1465,7 @@ class ProductCore extends ObjectModel
         return $result;
     }
 
-    public function getAvailableServiceProductsCategories($id_lang, $front = false, $active = true, Context $context = null)
+    public function getAvailableServiceProductsCategories($id_lang, $front = false, $active = true, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -1545,7 +1545,7 @@ class ProductCore extends ObjectModel
         return count($result) > 0;
     }
 
-    public function productAttributeExists($attributes_list, $current_product_attribute = false, Context $context = null, $all_shops = false, $return_id = false)
+    public function productAttributeExists($attributes_list, $current_product_attribute = false, ?Context $context = null, $all_shops = false, $return_id = false)
     {
         if (!Combination::isFeatureActive()) {
             return false;
@@ -2457,7 +2457,7 @@ class ProductCore extends ObjectModel
     * @param int $nbProducts Number of products to return (optional)
     * @return array New products
     */
-    public static function getNewProducts($id_lang, $page_number = 0, $nb_products = 10, $count = false, $order_by = null, $order_way = null, Context $context = null)
+    public static function getNewProducts($id_lang, $page_number = 0, $nb_products = 10, $count = false, $order_by = null, $order_way = null, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -2571,7 +2571,7 @@ class ProductCore extends ObjectModel
         return Product::getProductsProperties((int)$id_lang, $result);
     }
 
-    protected static function _getProductIdByDate($beginning, $ending, Context $context = null, $with_combination = false)
+    protected static function _getProductIdByDate($beginning, $ending, ?Context $context = null, $with_combination = false)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -2605,7 +2605,7 @@ class ProductCore extends ObjectModel
     * @param int $id_lang Language id
     * @return array Special
     */
-    public static function getRandomSpecial($id_lang, $beginning = false, $ending = false, Context $context = null)
+    public static function getRandomSpecial($id_lang, $beginning = false, $ending = false, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -2698,7 +2698,7 @@ class ProductCore extends ObjectModel
     * @return array Prices drop
     */
     public static function getPricesDrop($id_lang, $page_number = 0, $nb_products = 10, $count = false,
-        $order_by = null, $order_way = null, $beginning = false, $ending = false, Context $context = null)
+        $order_by = null, $order_way = null, $beginning = false, $ending = false, ?Context $context = null)
     {
         if (!Validate::isBool($count)) {
             die(Tools::displayError());
@@ -2929,7 +2929,7 @@ class ProductCore extends ObjectModel
     * @param int $id_lang Language id for multilingual legends
     * @return array Product images and legends
     */
-    public function getImages($id_lang, Context $context = null)
+    public function getImages($id_lang, ?Context $context = null)
     {
         return Db::getInstance()->executeS('
 			SELECT image_shop.`cover`, i.`id_image`, il.`legend`, i.`position`
@@ -2946,7 +2946,7 @@ class ProductCore extends ObjectModel
     *
     * @return array Product cover image
     */
-    public static function getCover($id_product, Context $context = null)
+    public static function getCover($id_product, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -2995,7 +2995,7 @@ class ProductCore extends ObjectModel
      */
     public static function getPriceStatic($id_product, $usetax = true, $id_product_attribute = null, $decimals = 6, $divisor = null,
         $only_reduc = false, $usereduc = true, $quantity = 1, $force_associated_tax = false, $id_customer = null, $id_cart = null,
-        $id_address = null, &$specific_price_output = null, $with_ecotax = true, $use_group_reduction = true, Context $context = null,
+        $id_address = null, &$specific_price_output = null, $with_ecotax = true, $use_group_reduction = true, ?Context $context = null,
         $use_customer_price = true, $id_product_roomtype = false)
     {
         if (!$context) {
@@ -3395,7 +3395,7 @@ class ProductCore extends ObjectModel
         return self::$_prices[$cache_id];
     }
 
-    public static function convertAndFormatPrice($price, $currency = false, Context $context = null)
+    public static function convertAndFormatPrice($price, $currency = false, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -3406,7 +3406,7 @@ class ProductCore extends ObjectModel
         return Tools::displayPrice(Tools::convertPrice($price, $currency), $currency);
     }
 
-    public static function isDiscounted($id_product, $quantity = 1, Context $context = null)
+    public static function isDiscounted($id_product, $quantity = 1, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -3562,7 +3562,7 @@ class ProductCore extends ObjectModel
      * @param Shop $shop
      * @return string
      */
-    public static function sqlStock($product_alias, $product_attribute = null, $inner_join = false, Shop $shop = null)
+    public static function sqlStock($product_alias, $product_attribute = null, $inner_join = false, ?Shop $shop = null)
     {
         $id_shop = ($shop !== null ? (int)$shop->id : null);
         $sql = (($inner_join) ? ' INNER ' : ' LEFT ')
@@ -4028,7 +4028,7 @@ class ProductCore extends ObjectModel
     * @param string $query Search query
     * @return array Matching products
     */
-    public static function searchByName($id_lang, $query, Context $context = null, $id_hotel = false)
+    public static function searchByName($id_lang, $query, ?Context $context = null, $id_hotel = false)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -4484,7 +4484,7 @@ class ProductCore extends ObjectModel
     /**
     * Get the link of the product page of this product
     */
-    public function getLink(Context $context = null)
+    public function getLink(?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -4519,7 +4519,7 @@ class ProductCore extends ObjectModel
         return Language::getIsoById((int)$id_lang).'-default';
     }
 
-    public static function getProductProperties($id_lang, $row, Context $context = null)
+    public static function getProductProperties($id_lang, $row, ?Context $context = null)
     {
         if (!$row['id_product']) {
             return false;
@@ -4673,7 +4673,7 @@ class ProductCore extends ObjectModel
         return self::$producPropertiesCache[$cache_key];
     }
 
-    public static function getTaxesInformations($row, Context $context = null)
+    public static function getTaxesInformations($row, ?Context $context = null)
     {
         static $address = null;
 
@@ -5113,7 +5113,7 @@ class ProductCore extends ObjectModel
         );
     }
 
-    public function hasAllRequiredCustomizableFields(Context $context = null)
+    public function hasAllRequiredCustomizableFields(?Context $context = null)
     {
         if (!Customization::isFeatureActive()) {
             return true;
@@ -5300,7 +5300,7 @@ class ProductCore extends ObjectModel
         return $this->id_tax_rules_group;
     }
 
-    public static function getIdTaxRulesGroupByIdProduct($id_product, Context $context = null)
+    public static function getIdTaxRulesGroupByIdProduct($id_product, ?Context $context = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -5323,7 +5323,7 @@ class ProductCore extends ObjectModel
      * @param Address|null $address
      * @return float The total taxes rate applied to the product
      */
-    public function getTaxesRate(Address $address = null)
+    public function getTaxesRate(?Address $address = null)
     {
         if (!$address || !$address->id_country) {
             $address = Address::initialize(Cart::getIdAddressForTaxCalculation($this->id));

@@ -540,7 +540,7 @@ class MailCore extends ObjectModel
      * @param string $string raw sentence (write directly in file)
      * @return mixed
      */
-    public static function l($string, $id_lang = null, Context $context = null)
+    public static function l($string, $id_lang = null, ?Context $context = null)
     {
         global $_LANGMAIL;
 

@@ -1106,7 +1106,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
      *
      * @return string
      */
-    public static function displayFieldName($field, $class = __CLASS__, $htmlentities = true, Context $context = null)
+    public static function displayFieldName($field, $class = __CLASS__, $htmlentities = true, ?Context $context = null)
     {
         global $_FIELDS;
 

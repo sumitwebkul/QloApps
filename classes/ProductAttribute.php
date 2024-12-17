@@ -198,7 +198,7 @@ class ProductAttributeCore extends ObjectModel
      * @param int $qty Quantity needed
      * @return bool Quantity is available or not
      */
-    public static function checkAttributeQty($id_product_attribute, $qty, Shop $shop = null)
+    public static function checkAttributeQty($id_product_attribute, $qty, ?Shop $shop = null)
     {
         if (!$shop) {
             $shop = Context::getContext()->shop;
