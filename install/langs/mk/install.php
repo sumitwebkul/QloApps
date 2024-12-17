@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Инсталирајте модули за додатоци',
 		'Install theme' => 'Инсталирајте ја темата',
 		'Required PHP parameters' => 'Потребни PHP параметри',
-		'The required PHP version is between 8.0 to 8.4.1' => 'Потребната верзија на PHP е помеѓу 8.0 и 8.4.1',
+		'The required PHP version is between 8.0 to 8.4' => 'Потребната верзија на PHP е помеѓу 8.0 и 8.4',
 		'Cannot upload files' => 'Не може да се прикачат датотеки',
 		'Cannot create new files and folders' => 'Не може да се создадат нови датотеки и папки',
 		'GD library is not installed' => 'Библиотеката GD не е инсталирана',

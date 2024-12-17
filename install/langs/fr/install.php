@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Installer les modules complémentaires',
 		'Install theme' => 'Installer le thème',
 		'Required PHP parameters' => 'Paramètres PHP requis',
-		'The required PHP version is between 8.0 to 8.4.1' => 'La version PHP requise est comprise entre 8.0 et 8.4.1',
+		'The required PHP version is between 8.0 to 8.4' => 'La version PHP requise est comprise entre 8.0 et 8.4',
 		'Cannot upload files' => 'Impossible de télécharger des fichiers',
 		'Cannot create new files and folders' => 'Impossible de créer de nouveaux fichiers et dossiers',
 		'GD library is not installed' => 'La bibliothèque GD n\'est pas installée',

@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'ماژول های Addons را نصب کنید',
 		'Install theme' => 'تم را نصب کنید',
 		'Required PHP parameters' => 'پارامترهای مورد نیاز PHP',
-		'The required PHP version is between 8.0 to 8.4.1' => 'نسخه PHP مورد نیاز بین 8.0 تا 8.4.1 است',
+		'The required PHP version is between 8.0 to 8.4' => 'نسخه PHP مورد نیاز بین 8.0 تا 8.4 است',
 		'Cannot upload files' => 'نمی توان فایل ها را آپلود کرد',
 		'Cannot create new files and folders' => 'نمی توان فایل ها و پوشه های جدید ایجاد کرد',
 		'GD library is not installed' => 'کتابخانه GD نصب نشده است',

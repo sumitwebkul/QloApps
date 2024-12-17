@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Installera tilläggsmoduler',
 		'Install theme' => 'Installera tema',
 		'Required PHP parameters' => 'Nödvändiga PHP-parametrar',
-		'The required PHP version is between 8.0 to 8.4.1' => 'Den nödvändiga PHP-versionen är mellan 8.0 och 8.4.1',
+		'The required PHP version is between 8.0 to 8.4' => 'Den nödvändiga PHP-versionen är mellan 8.0 och 8.4',
 		'Cannot upload files' => 'Kan inte ladda upp filer',
 		'Cannot create new files and folders' => 'Det går inte att skapa nya filer och mappar',
 		'GD library is not installed' => 'GD-biblioteket är inte installerat',
