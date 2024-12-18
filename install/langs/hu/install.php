@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Telepítse az Addons modulokat',
 		'Install theme' => 'Telepítse a témát',
 		'Required PHP parameters' => 'Kötelező PHP paraméterek',
-		'The required PHP version is between 8.1to 8.4' => 'A szükséges PHP verzió 8.1 és 8.4 között van',
+		'The required PHP version is between 8.1 to 8.4' => 'A szükséges PHP verzió 8.1 és 8.4 között van',
 		'Cannot upload files' => 'Nem lehet fájlokat feltölteni',
 		'Cannot create new files and folders' => 'Nem lehet új fájlokat és mappákat létrehozni',
 		'GD library is not installed' => 'A GD könyvtár nincs telepítve',

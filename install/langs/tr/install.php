@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Eklenti modüllerini yükleyin',
 		'Install theme' => 'TEMAYI yükle',
 		'Required PHP parameters' => 'Gerekli PHP parametreleri',
-		'The required PHP version is between 8.1to 8.4' => 'Gerekli PHP sürümü 8.1 ila 8.4 arasındadır',
+		'The required PHP version is between 8.1 to 8.4' => 'Gerekli PHP sürümü 8.1 ila 8.4 arasındadır',
 		'Cannot upload files' => 'Dosyalar yüklenemiyor',
 		'Cannot create new files and folders' => 'Yeni dosya ve klasörler oluşturulamıyor',
 		'GD library is not installed' => 'GD kütüphanesi kurulu değil',

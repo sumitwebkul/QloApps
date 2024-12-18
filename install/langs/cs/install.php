@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Nainstalujte moduly Addons',
 		'Install theme' => 'Nainstalujte motiv',
 		'Required PHP parameters' => 'Požadované parametry PHP',
-		'The required PHP version is between 8.1to 8.4' => 'Požadovaná verze PHP je mezi 8.1 a 8.4',
+		'The required PHP version is between 8.1 to 8.4' => 'Požadovaná verze PHP je mezi 8.1 a 8.4',
 		'Cannot upload files' => 'Nelze nahrávat soubory',
 		'Cannot create new files and folders' => 'Nelze vytvářet nové soubory a složky',
 		'GD library is not installed' => 'Knihovna GD není nainstalována',
