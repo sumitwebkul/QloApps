@@ -793,7 +793,11 @@ class FrontControllerCore extends Controller
             Context::getContext()->cookie->write();
             if ($this->maintenance == true || !(int)Configuration::get('PS_SHOP_ENABLE')) {
                 $this->maintenance = true;
-                if (!in_array(Tools::getRemoteAddr(), explode(',', Configuration::get('PS_MAINTENANCE_IP')))) {
+                $allowedIps = array();
+                if (Configuration::get('PS_MAINTENANCE_IP')) {
+                    $allowedIps = explode(',', Configuration::get('PS_MAINTENANCE_IP'));
+                }
+                if (!$allowedIps || !in_array(Tools::getRemoteAddr(), $allowedIps)) {
                     header('HTTP/1.1 503 temporarily overloaded');
 
                     $this->context->smarty->assign($this->initLogoAndFavicon());
