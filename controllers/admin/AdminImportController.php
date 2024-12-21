@@ -601,7 +601,7 @@ class AdminImportControllerCore extends AdminController
         $html .= '</tr></thead><tbody>';
 
         AdminImportController::setLocale();
-        for ($current_line = 0; $current_line < 10 && $line = fgetcsv($handle, MAX_LINE_SIZE, $glue); $current_line++) {
+        for ($current_line = 0; $current_line < 10 && $line = fgetcsv($handle, MAX_LINE_SIZE, $glue, escape: ""); $current_line++) {
             /* UTF-8 conversion */
             if (Tools::getValue('convert')) {
                 $line = $this->utf8EncodeArray($line);
@@ -695,7 +695,7 @@ class AdminImportControllerCore extends AdminController
         $tab = '';
         if (!empty($uniqid_path)) {
             $fd = fopen($uniqid_path, 'r');
-            $tab = fgetcsv($fd, MAX_LINE_SIZE, $separator);
+            $tab = fgetcsv($fd, MAX_LINE_SIZE, $separator, escape: "");
             fclose($fd);
             if (file_exists($uniqid_path)) {
                 @unlink($uniqid_path);
@@ -997,7 +997,7 @@ class AdminImportControllerCore extends AdminController
             Configuration::get('PS_LOCATIONS_CATEGORY'),
         );
 
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -1163,7 +1163,7 @@ class AdminImportControllerCore extends AdminController
         $force_ids = Tools::getValue('forceIDs');
         $regenerate = Tools::getValue('regenerate');
         $objHotelImage = new HotelImage();
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -1501,7 +1501,7 @@ class AdminImportControllerCore extends AdminController
         Module::setBatchMode(true);
         $objRoomType = new HotelRoomType();
         $objAdvancePayment = new HotelAdvancedPayment();
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -1985,7 +1985,7 @@ class AdminImportControllerCore extends AdminController
         $objHotelRoomType = new HotelRoomType();
         $objHotelRoomInformation = new HotelRoomInformation();
         $statuses = array_column($objHotelRoomInformation->getAllRoomStatus(), 'id');
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -2099,7 +2099,7 @@ class AdminImportControllerCore extends AdminController
         $regenerate = Tools::getValue('regenerate');
         $shop_is_feature_active = Shop::isFeatureActive();
         Module::setBatchMode(true);
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -2439,7 +2439,7 @@ class AdminImportControllerCore extends AdminController
         $ordersRow = array();
         $hotelRoomTypeInfo = array();
         $orderInfo = array();
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -2740,7 +2740,7 @@ class AdminImportControllerCore extends AdminController
             $phoneRequired = true;
         }
 
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -2926,7 +2926,7 @@ class AdminImportControllerCore extends AdminController
         $convert = Tools::getValue('convert');
         $force_ids = Tools::getValue('forceIDs');
 
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); $current_line++) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); $current_line++) {
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
             }
@@ -2993,7 +2993,7 @@ class AdminImportControllerCore extends AdminController
         $force_ids = Tools::getValue('forceIDs');
 
         // main loop, for each supply orders to import
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); ++$current_line) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); ++$current_line) {
             // if convert requested
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
@@ -3109,7 +3109,7 @@ class AdminImportControllerCore extends AdminController
         $force_ids = Tools::getValue('forceIDs');
 
         // main loop, for each supply orders details to import
-        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator); ++$current_line) {
+        for ($current_line = 0; $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: ""); ++$current_line) {
             // if convert requested
             if ($convert) {
                 $line = $this->utf8EncodeArray($line);
@@ -3225,7 +3225,7 @@ class AdminImportControllerCore extends AdminController
         if (!is_resource($handle)) {
             return false;
         }
-        $tmp = fgetcsv($handle, MAX_LINE_SIZE, $glue);
+        $tmp = fgetcsv($handle, MAX_LINE_SIZE, $glue, escape: "");
         AdminImportController::rewindBomAware($handle);
         return count($tmp);
     }
@@ -3253,7 +3253,7 @@ class AdminImportControllerCore extends AdminController
         AdminImportController::rewindBomAware($handle);
 
         for ($i = 0; $i < (int)Tools::getValue('skip'); ++$i) {
-            $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator);
+            $line = fgetcsv($handle, MAX_LINE_SIZE, $this->separator, escape: "");
         }
         return $handle;
     }
