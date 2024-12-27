@@ -1697,6 +1697,8 @@ class AdminOrdersControllerCore extends AdminController
                             } else {
                                 $paymentAmount = (float) $paymentAmount;
                             }
+                        } else {
+                            $paymentAmount = $orderTotal;
                         }
 
                         if ($paymentAmount >= 0) {

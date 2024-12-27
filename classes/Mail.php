@@ -353,10 +353,10 @@ class MailCore extends ObjectModel
                 }
             }
             ShopUrl::cacheMainDomainForShop((int)$id_shop);
-            /* don't attach the logo as */
 
+            /* don't attach the logo as */
             if (isset($logo)) {
-                $templateVars['{shop_logo}'] = 'cid:shop_logo';
+                $template_vars['{shop_logo}'] = 'cid:shop_logo';
                 $email->embedFromPath($logo, 'shop_logo');
             }
 
