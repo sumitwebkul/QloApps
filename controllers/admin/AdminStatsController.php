@@ -812,16 +812,18 @@ class AdminStatsControllerCore extends AdminStatsTabController
             case 'conversion_rate':
                 $nbDaysConversionRate = Validate::isUnsignedInt(Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS')) ? Configuration::get('PS_KPI_CONVERSION_RATE_NB_DAYS') : 30;
 
+                $dateFrom = date('Y-m-d', strtotime('-'.($nbDaysConversionRate + 1).' day'));
+                $dateTo = date('Y-m-d');
                 $visitors = AdminStatsController::getVisits(
-                    true,
-                    date('Y-m-d', strtotime('-'.($nbDaysConversionRate + 1).' day')),
-                    date('Y-m-d', strtotime('+1 day')),
+                    false,
+                    $dateFrom,
+                    $dateTo,
                     false /*'day'*/
                 );
 
                 $orders = AdminStatsController::getOrders(
-                    date('Y-m-d', strtotime('-'.($nbDaysConversionRate + 1).' day')),
-                    date('Y-m-d', strtotime('-1 day')),
+                    $dateFrom,
+                    $dateTo,
                     false /*'day'*/,
                     $idHotels
                 );
@@ -1013,7 +1015,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 $daysForProfitPerVisitor = Configuration::get('PS_ORDER_KPI_PER_VISITOR_PROFIT_NB_DAYS');
 
                 $date_from = date('Y-m-d', strtotime('-'.($daysForProfitPerVisitor + 1).' day'));
-                $date_to = date('Y-m-d', strtotime('-1 day'));
+                $date_to = date('Y-m-d');
 
                 $total_visitors = AdminStatsController::getVisits(false, $date_from, $date_to);
                 $net_profits = AdminStatsController::getTotalSales($date_from, $date_to, false, $idHotels);
