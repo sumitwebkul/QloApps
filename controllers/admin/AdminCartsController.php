@@ -1428,7 +1428,6 @@ class AdminCartsControllerCore extends AdminController
                             $objServiceProduct->updateCategories(array(
                                 Configuration::get('PS_SERVICE_CATEGORY')
                             ));
-
                             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                             $objRoomTypeServiceProduct->addRoomProductLink(
                                 $objServiceProduct->id,
