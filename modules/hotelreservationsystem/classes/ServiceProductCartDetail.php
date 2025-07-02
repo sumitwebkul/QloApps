@@ -224,9 +224,16 @@ class ServiceProductCartDetail extends ObjectModel
         if ($serviceProducts = Db::getInstance()->executeS($sql)) {
             $context = Context::getContext();
             foreach ($serviceProducts as $product) {
+                $idRoom = 0;
+                if ($product['htl_cart_booking_id']) {
+                    $objHotelCartBooking = new HotelCartBookingData($product['htl_cart_booking_id']);
+                    $idRoom = $objHotelCartBooking->id_room;
+                }
                 $objProduct = new Product($product['id_product'], false, $language->id);
                 if (!$objProduct->booking_product) {
                     if ($getTotalPrice) {
+                        var_dump($idRoom);
+
                         $qty = $product['quantity'] ? (int)$product['quantity'] : 1;
                         $totalPrice += Product::getServiceProductPrice(
                             $objProduct->id,
@@ -237,7 +244,10 @@ class ServiceProductCartDetail extends ObjectModel
                             $qty,
                             $product['date_from'],
                             $product['date_to'],
-                            $idCart
+                            $idCart,
+                            null,
+                            1,
+                            $idRoom
                         );
                     } else {
                         $numDays = 1;
@@ -257,7 +267,10 @@ class ServiceProductCartDetail extends ObjectModel
                             1,
                             $product['date_from'],
                             $product['date_to'],
-                            $idCart
+                            $idCart,
+                            null,
+                            1,
+                            $idRoom
                         )/$numDays;
                         $priceTaxExcl = Product::getServiceProductPrice(
                             $objProduct->id,
@@ -268,7 +281,10 @@ class ServiceProductCartDetail extends ObjectModel
                             1,
                             $product['date_from'],
                             $product['date_to'],
-                            $idCart
+                            $idCart,
+                            null,
+                            1,
+                            $idRoom
                         )/$numDays;
 
                         $optionDetails = false;
@@ -319,7 +335,6 @@ class ServiceProductCartDetail extends ObjectModel
                         );
 
                         if ($product['htl_cart_booking_id']) {
-                            $objHotelCartBooking = new HotelCartBookingData($product['htl_cart_booking_id']);
                             $productInfo['date_from'] = $objHotelCartBooking->date_from;
                             $productInfo['date_to'] = $objHotelCartBooking->date_to;
                             $productInfo['id_room_type_hotel'] = $objHotelCartBooking->id_hotel;

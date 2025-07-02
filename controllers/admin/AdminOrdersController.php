@@ -397,12 +397,15 @@ class AdminOrdersControllerCore extends AdminController
                 $cart_detail_data = array();
                 $cart_detail_data_obj = new HotelCartBookingData();
                 $objServiceProductCartDetail = new ServiceProductCartDetail();
+                ppp('$cart_detail_data');
+
                 if ($cart_detail_data = $cart_detail_data_obj->getCartFormatedBookinInfoByIdCart((int) $id_cart)) {
                     $objRoomType = new HotelRoomType();
                     foreach ($cart_detail_data as $key => $cart_data) {
                         $cart_detail_data[$key]['room_type_info'] = $objRoomType->getRoomTypeInfoByIdProduct($cart_data['id_product']);
                     }
                     $this->context->smarty->assign('cart_detail_data', $cart_detail_data);
+                    ddd($cart_detail_data);
                 }
                 if ($cartHotelProduct = $objServiceProductCartDetail->getServiceProductsInCart($this->context->cart->id)) {
                     $this->context->smarty->assign('cart_hotel_product_data', $cartHotelProduct);

@@ -3042,7 +3042,7 @@ class ProductCore extends ObjectModel
     public static function getPriceStatic($id_product, $usetax = true, $id_product_attribute = null, $decimals = 6, $divisor = null,
         $only_reduc = false, $usereduc = true, $quantity = 1, $force_associated_tax = false, $id_customer = null, $id_cart = null,
         $id_address = null, &$specific_price_output = null, $with_ecotax = true, $use_group_reduction = true, ?Context $context = null,
-        $use_customer_price = true, $id_hotel = false, $id_product_room_type = false, $id_group = null)
+        $use_customer_price = true, $id_hotel = false, $id_product_room_type = false, $id_group = null, $id_room = null)
     {
         if (!$context) {
             $context = Context::getContext();
@@ -3177,7 +3177,8 @@ class ProductCore extends ObjectModel
             $id_cart,
             $cart_quantity,
             $id_hotel,
-            $id_product_room_type
+            $id_product_room_type,
+            $id_room
         );
 
         return $return;
@@ -3211,7 +3212,7 @@ class ProductCore extends ObjectModel
      **/
     public static function priceCalculation($id_shop, $id_product, $id_product_attribute, $id_country, $id_state, $zipcode, $id_currency,
         $id_group, $quantity, $use_tax, $decimals, $only_reduc, $use_reduc, $with_ecotax, &$specific_price, $use_group_reduction,
-        $id_customer = 0, $use_customer_price = true, $id_cart = 0, $real_quantity = 0, $id_hotel = false, $id_product_room_type = false)
+        $id_customer = 0, $use_customer_price = true, $id_cart = 0, $real_quantity = 0, $id_hotel = false, $id_product_room_type = false, $id_room = false)
     {
         static $address = null;
         static $context = null;
@@ -3260,7 +3261,7 @@ class ProductCore extends ObjectModel
             $id_customer,
             $id_cart,
             $real_quantity,
-            $id_product_room_type
+            $id_room
         );
 
         if (isset(self::$_prices[$cache_id])) {
@@ -6816,7 +6817,9 @@ class ProductCore extends ObjectModel
         $dateTo = null,
         $idCart = false,
         $idAddress = null,
-        $useReduc = 1
+        $useReduc = 1,
+        $idRoom = null,
+        $idGroup = null
     ) {
         if ($useTax === null) {
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
@@ -6841,8 +6844,12 @@ class ProductCore extends ObjectModel
             null,
             true,
             (int)$idHotel,
-            (int)$idProductRoomType
+            (int)$idProductRoomType,
+            null,
+            $idRoom
         );
+
+        var_dump($idRoom);
 
         Hook::exec('actionServiceProductPricePriceModifier',
             array(
