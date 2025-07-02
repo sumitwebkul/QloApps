@@ -1678,6 +1678,7 @@ class AdminCartsControllerCore extends AdminController
                                     $objSpecificPrice->id_group = 0;
                                     $objSpecificPrice->id_customer = $objCart->id_customer;
                                     $objSpecificPrice->id_product = $idServiceProduct;
+                                    $objSpecificPrice->id_element = $objHotelCartBookingData->id_product;
                                     $objSpecificPrice->id_product_attribute = 0;
                                     $objSpecificPrice->price = $unitPrice;
                                     $objSpecificPrice->from_quantity = 1;

@@ -31,6 +31,7 @@ class SpecificPriceCore extends ObjectModel
     public $id_cart = 0;
     public $id_product_attribute;
     public $id_shop;
+    public $id_element;
     public $id_shop_group;
     public $id_currency;
     public $id_country;
@@ -55,6 +56,7 @@ class SpecificPriceCore extends ObjectModel
             'id_shop' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_cart' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_product' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'id_element' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_product_attribute' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_currency' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_specific_price_rule' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
@@ -345,7 +347,7 @@ class SpecificPriceCore extends ObjectModel
         }
     }
 
-    public static function getSpecificPrice($id_product, $id_shop, $id_currency, $id_country, $id_group, $quantity, $id_product_attribute = null, $id_customer = 0, $id_cart = 0, $real_quantity = 0, $id_room = 0)
+    public static function getSpecificPrice($id_product, $id_shop, $id_currency, $id_country, $id_group, $quantity, $id_product_attribute = null, $id_customer = 0, $id_cart = 0, $real_quantity = 0, $id_element = 0)
     {
         if (!SpecificPrice::isFeatureActive()) {
             return array();
@@ -365,6 +367,7 @@ class SpecificPriceCore extends ObjectModel
                 `id_shop` '.self::formatIntInQuery(0, $id_shop).' AND
                 `id_currency` '.self::formatIntInQuery(0, $id_currency).' AND
                 `id_country` '.self::formatIntInQuery(0, $id_country).
+                $id_element ? ' AND `id_element` = '.(int)$id_element : ''.
                 (Group::isFeatureActive() ? ' AND `id_group` '.self::formatIntInQuery(0, $id_group) : '').' '.$query_extra.'
 				AND IF(`from_quantity` > 1, `from_quantity`, 0) <= ';
 
