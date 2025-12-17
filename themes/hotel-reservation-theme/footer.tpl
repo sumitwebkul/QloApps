@@ -22,6 +22,8 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+
+International Registered Trademark & Property of PrestaShop SAInternational Registered Trademark & Property of PrestaShop SAInternational Registered Trademark & Property of PrestaShop SAInternational Registered Trademark & Property of PrestaShop SA
 {if !isset($content_only) || !$content_only}
 					</div><!-- #center_column -->
 					{if isset($right_column_size) && !empty($right_column_size)}
