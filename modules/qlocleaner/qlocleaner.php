@@ -37,7 +37,7 @@ class QloCleaner extends Module
     {
         $this->name = 'qlocleaner';
         $this->tab = 'administration';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -322,6 +322,7 @@ class QloCleaner extends Module
                     }
                 }
                 $db->execute('DELETE FROM `'._DB_PREFIX_.'address` WHERE id_customer > 0');
+                $db->execute('DELETE FROM `'._DB_PREFIX_.'specific_price` WHERE id_cart > 0');
                 $db->execute('UPDATE `'._DB_PREFIX_.'employee` SET `id_last_order` = 0,`id_last_customer_message` = 0,`id_last_customer` = 0');
 
                 break;

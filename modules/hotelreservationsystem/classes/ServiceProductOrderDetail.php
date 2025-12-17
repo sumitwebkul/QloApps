@@ -1,21 +1,24 @@
 <?php
 /**
-* 2010-2022 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2022 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 
@@ -194,7 +197,7 @@ class ServiceProductOrderDetail extends ObjectModel
         if (!$getTotalPrice) {
             $sql .= ', hbd.`id_product` as `id_room_type`, od.`product_price_calculation_method`,
             hbd.`id_room`, hbd.`adults`, hbd.`children`, hbd.`date_from`, hbd.`date_to`, hbd.`room_type_name`, p.`max_quantity`,
-            spod.`id_product` as id_product,  od.`product_allow_multiple_quantity`, od.`product_price_calculation_method`, od.`product_auto_add`, od.`product_price_addition_type`';
+            spod.`id_product` as id_product,  od.`product_allow_multiple_quantity`, od.`product_price_calculation_method`, od.`product_auto_add`, od.`product_price_addition_type`, IF(p.`id_product`, 0, 1) as `product_deleted`';
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'service_product_order_detail` spod ON(spod.`id_htl_booking_detail` = hbd.`id`)';
@@ -273,6 +276,8 @@ class ServiceProductOrderDetail extends ObjectModel
                             'product_tax' => $product_tax,
                             'product_tax_label' => $product_tax_label,
                             'allow_multiple_quantity' => $product['product_allow_multiple_quantity'],
+                            'tax_computation_method' => $product['tax_computation_method'],
+                            'id_tax_rules_group' => $product['id_tax_rules_group'],
                             'price_calculation_method' => $product['product_price_calculation_method'],
                             'total_price_tax_excl' => $product['total_price_tax_excl'],
                             'total_price_tax_incl' => $product['total_price_tax_incl'],
@@ -280,7 +285,8 @@ class ServiceProductOrderDetail extends ObjectModel
                             'unit_price_tax_incl' => $product['unit_price_tax_incl'],
                             'product_auto_add' => $product['product_auto_add'],
                             'product_price_addition_type' => $product['product_price_addition_type'],
-                            'max_quantity' => (int) $product['max_quantity']
+                            'max_quantity' => (int) $product['max_quantity'],
+                            'product_deleted' => $product['product_deleted']
                         );
                     } else {
                         $selectedAdditionalServices[$product['id_htl_booking_detail']]['id_order'] = $product['id_order'];
@@ -304,6 +310,8 @@ class ServiceProductOrderDetail extends ObjectModel
                                 'name' => $product['name'],
                                 'quantity' => $product['quantity'],
                                 'allow_multiple_quantity' => $product['product_allow_multiple_quantity'],
+                                'tax_computation_method' => $product['tax_computation_method'],
+                                'id_tax_rules_group' => $product['id_tax_rules_group'],
                                 'price_calculation_method' => $product['product_price_calculation_method'],
                                 'product_tax' => $product_tax,
                                 'product_tax_label' => $product_tax_label,
@@ -313,7 +321,8 @@ class ServiceProductOrderDetail extends ObjectModel
                                 'unit_price_tax_incl' => $product['unit_price_tax_incl'],
                                 'product_auto_add' => $product['product_auto_add'],
                                 'product_price_addition_type' => $product['product_price_addition_type'],
-                                'max_quantity' => (int) $product['max_quantity']
+                                'max_quantity' => (int) $product['max_quantity'],
+                                'product_deleted' => $product['product_deleted'],
                             ),
                         );
                     }

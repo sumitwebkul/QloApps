@@ -1,21 +1,24 @@
 <?php
 /**
-* 2010-2020 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2020 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 class ServiceProductCartDetail extends ObjectModel
@@ -237,7 +240,11 @@ class ServiceProductCartDetail extends ObjectModel
                             $qty,
                             $product['date_from'],
                             $product['date_to'],
-                            $idCart
+                            $idCart,
+                            null,
+                            1,
+                            null,
+                            $product['htl_cart_booking_id']
                         );
                     } else {
                         $numDays = 1;
@@ -257,7 +264,11 @@ class ServiceProductCartDetail extends ObjectModel
                             1,
                             $product['date_from'],
                             $product['date_to'],
-                            $idCart
+                            $idCart,
+                            null,
+                            1,
+                            null,
+                            $product['htl_cart_booking_id']
                         )/$numDays;
                         $priceTaxExcl = Product::getServiceProductPrice(
                             $objProduct->id,
@@ -268,7 +279,11 @@ class ServiceProductCartDetail extends ObjectModel
                             1,
                             $product['date_from'],
                             $product['date_to'],
-                            $idCart
+                            $idCart,
+                            null,
+                            1,
+                            null,
+                            $product['htl_cart_booking_id']
                         )/$numDays;
 
                         $optionDetails = false;
@@ -440,6 +455,16 @@ class ServiceProductCartDetail extends ObjectModel
         }
 
         if ($objServiceProductCartDetail->save()) {
+            if ($objProduct->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                if (Validate::isLoadedObject($objHotelCartBooking = new HotelCartBookingData($idHtlCartData))) {
+                    $numDays = HotelHelper::getNumberOfDays(
+                        $objHotelCartBooking->date_from,
+                        $objHotelCartBooking->date_to
+                    );
+                    $quantity = $objServiceProductCartDetail->quantity * $numDays;
+                }
+            }
+
             $objCart = new Cart($idCart);
             return $objCart->updateQty($quantity, $idProduct);
         }
@@ -525,6 +550,29 @@ class ServiceProductCartDetail extends ObjectModel
         }
 
         return true;
+    }
+
+    public function delete()
+    {
+        $objCart = new Cart($this->id_cart);
+        if ($specificPriceInfo = SpecificPrice::getSpecificPrice(
+            (int)$this->id_product,
+            0,
+            $objCart->id_currency,
+            0,
+            0,
+            1,
+            0,
+            0,
+            $objCart->id,
+            0,
+            $this->htl_cart_booking_id
+        )) {
+            $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
+            $objSpecificPrice->delete();
+        }
+
+        return parent::delete();
     }
 
     public static function validateServiceProductsInCart()

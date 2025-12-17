@@ -1,20 +1,23 @@
 {*
-* Since 2010 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright Since 2010 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
 <div id="room_type_service_product_desc" class="tab-pane {if isset($show_active) && $show_active}active{/if} extra-services-container">
@@ -41,6 +44,7 @@
                             <th class="fixed-width-sm text-center">{l s='Quantity'}</th>
                             <th>{l s='Unit Price (tax excl.)'}</th>
                             <th>{l s='Total Price (tax excl.)'}</th>
+                            <th>{l s='Total Price (tax incl.)'}</th>
                             <th class="text-right">{l s='Action'}</th>
                         </tr>
                     </thead>
@@ -84,6 +88,7 @@
                                         </div>
                                     </td>
                                     <td>{displayPrice price=$service['total_price_tax_excl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
+                                    <td>{displayPrice price=$service['total_price_tax_incl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
                                     <td class="text-right"><a class="btn btn-danger pull-right del_room_additional_service" data-id_service_product_order_detail="{$service['id_service_product_order_detail']}" href="#"><i class="icon-trash"></i></a></td>
                                 </tr>
                             {/foreach}
@@ -251,15 +256,16 @@
 					<th>{l s='ID'}</th>
 					<th>{l s='Name'}</th>
 					<th></th>
-					<th>{l s='Unit Price'}</th>
-					<th>{l s='Total Price'}</th>
+					<th>{l s='Unit Price (tax excl.)'}</th>
+					<th>{l s='Total Price (tax excl.)'}</th>
+					<th>{l s='Total Price (tax incl.)'}</th>
 				</tr>
 			</thead>
 			</tbody>
 				{foreach $additionalServices['additional_services'] as $service}
 					<tr class="room_demand_block">
 						<td>
-							{$service['id_product']|escape:'html':'UTF-8'} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service['id_product']|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a>
+							{$service['id_product']|escape:'html':'UTF-8'}{if !$service['product_deleted']} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service['id_product']|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a>{/if}
 						</td>
 						<td>{$service['name']|escape:'html':'UTF-8'}</td>
 						<td>
@@ -278,6 +284,9 @@
 						</td>
 						<td>
 							{displayPrice price=$service['total_price_tax_excl'] currency=$orderCurrency}
+						</td>
+                        <td>
+							{displayPrice price=$service['total_price_tax_incl'] currency=$orderCurrency}
 						</td>
 					</tr>
 				{/foreach}

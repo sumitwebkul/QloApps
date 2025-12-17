@@ -2520,18 +2520,17 @@ class OrderCore extends ObjectModel
 
         $order_ecotax_tax = 0;
 
+        $objAddress = new Address((int)$this->id_address_tax);
         foreach ($order_details as $order_detail) {
             $tax_rates = array();
+            $groupedTaxDetails = array();
             $id_order_detail = $order_detail['id_order_detail'];
-
-            $taxesList = OrderDetail::getTaxListStatic($id_order_detail);
-            if (!$taxesList) {
-                continue;
-            }
+            $id_order_slip = $order_detail['id_order_slip'] ?? 0; // Only in case of order slip
 
             $tax_calculator = OrderDetail::getTaxCalculatorStatic($id_order_detail);
+
             $quantity = $order_detail['product_quantity'];
-            $unit_price_tax_excl = $order_detail['total_price_tax_excl'] / $quantity;
+            $unit_price_tax_excl = $order_detail['unit_price_tax_excl'];
 
             /*
              * Discounted taxes are intentionally not calculated here, as we do not want to display them.
@@ -2561,67 +2560,177 @@ class OrderCore extends ObjectModel
                 $tax_rates[$tax->id] = $tax->rate;
             }
 
-            $totalTaxBase = Tools::processPriceRounding($unit_price_tax_excl, $quantity);
-            if (!$order_detail['is_booking_product']) {
-                $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-                if ($serviceProductDetail = $objServiceProductOrderDetail->getServiceProductsInOrder(
-                    $order_detail['id_order'],
-                    $id_order_detail
-                )) {
-                    $totals = array_reduce($serviceProductDetail, function ($carry, $item) {
-                        if (!empty($item['id_tax_rules_group'])) {
-                            $qty = isset($item['quantity']) ? $item['quantity'] : 0;
-                            $price = isset($item['total_price_tax_excl']) ? $item['total_price_tax_excl'] : 0;
-    
-                            $carry['quantity'] += $qty;
-                            $carry['total_price_tax_excl'] += $price;
-                        }
-                        return $carry;
-                    }, ['quantity' => 0, 'total_price_tax_excl' => 0]);
-                    $quantity = $totals['quantity'];
-                    $totalTaxBase = $totals['total_price_tax_excl'];
+            $totalTaxBase = $order_detail['total_price_tax_excl'];
+
+            // Note: Only calculate in case of Order Invoice
+            if (!$id_order_slip) {
+                $taxesList = OrderDetail::getTaxListStatic($id_order_detail);
+                if (!$taxesList) {
+                    continue;
                 }
-            }
 
-            $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-            $groupedTaxDetails = array();
-            $additionalTaxAmounts = array();
+                if (!$order_detail['is_booking_product']) {
+                    $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+                    if ($serviceProductDetail = $objServiceProductOrderDetail->getServiceProductsInOrder(
+                        $order_detail['id_order'],
+                        $id_order_detail
+                    )) {
+                        $totals = array_reduce($serviceProductDetail, function ($carry, $item) use ($order_detail) {
+                            $objHotelBookingDetail = new HotelBookingDetail((int) $item['id_htl_booking_detail']);
+                            if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $order_detail['product_price_calculation_method'])
+                                && (!$numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to))
+                            ) {
+                                $numDays = 1;
+                            }
 
-            if (
-                $order_detail['is_booking_product'] &&
-                $autoAddedPriceExcl = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
-                    $order_detail['id_order'],
-                    0, 0,
-                    $order_detail['product_id'],
-                    0, 0, 0,
-                    true, false, true,
-                    Product::PRICE_ADDITION_TYPE_WITH_ROOM
-                )
-            ) {
-                $additionalTaxAmounts = $tax_calculator->getTaxesAmount($autoAddedPriceExcl);
-                $totalTaxBase += $autoAddedPriceExcl;
-            }
+                            if (!empty($item['id_tax_rules_group'])) {
+                                $qty = isset($item['quantity']) ? $item['quantity'] : 0;
+                                $price = isset($item['total_price_tax_excl']) ? $item['total_price_tax_excl'] : 0;
 
-            $taxBaseShare = $totalTaxBase;
+                                $carry['quantity'] += ($qty * $numDays);
+                                $carry['total_price_tax_excl'] += $price;
+                            }
+                            return $carry;
+                        }, ['quantity' => 0, 'total_price_tax_excl' => 0]);
+                        $quantity = $totals['quantity'];
+                        $totalTaxBase = $totals['total_price_tax_excl'];
+                    }
+                }
 
-            foreach ($taxesList as $detailTax) {
-                $taxId = $detailTax['id_tax'];
+                $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+                $additionalTaxAmounts = array();
 
-                $unitAmount = $detailTax['unit_amount'] + ($additionalTaxAmounts[$taxId] ?? 0);
-                $totalAmount = $detailTax['total_amount'] + ($additionalTaxAmounts[$taxId] ?? 0);
-
-                if (!isset($groupedTaxDetails[$taxId])) {
-                    $groupedTaxDetails[$taxId] = array(
-                        'id_order_detail' => $id_order_detail,
-                        'id_tax' => $taxId,
-                        'tax_rate' => $tax_rates[$taxId],
-                        'unit_tax_base' => $unit_price_tax_excl,
-                        'total_tax_base' => $taxBaseShare,
-                        'unit_amount' => $unitAmount,
-                        'total_amount' => $totalAmount,
+                if ($order_detail['is_booking_product']
+                    && ($autoAddedServiceData = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
+                        $order_detail['id_order'],
+                        0,
+                        0,
+                        $order_detail['product_id'],
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        Product::PRICE_ADDITION_TYPE_WITH_ROOM
+                    ))
+                ) {
+                    $autoAddedPriceExcl = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
+                        $order_detail['id_order'],
+                        0,
+                        0,
+                        $order_detail['product_id'],
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        1,
+                        Product::PRICE_ADDITION_TYPE_WITH_ROOM
                     );
-                } else {
-                    $groupedTaxDetails[$taxId]['total_amount'] += $totalAmount;
+
+                    // We are getting auto added service for specific room.There will be only on htl_booking_detail but can have multiple auto added service with room.
+                    // Note: All the auto added service with room  have same id_tax_rule group 
+                    $autoAddedServiceData = array_shift($autoAddedServiceData);
+                    $numDays = 1;
+                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $order_detail['product_price_calculation_method'])
+                        && (!$numDays = HotelHelper::getNumberOfDays($autoAddedServiceData['date_from'], $autoAddedServiceData['date_to']))
+                    ) {
+                        $numDays = 1;
+                    }
+                    $autoAddedServices = $autoAddedServiceData['additional_services'];
+
+                    // Calculate total quantity of auto-added services
+                    $totalAutoAddedQty = array_reduce($autoAddedServices, function ($quantity, $service) {
+                        $qty = isset($service['quantity']) ? $service['quantity'] : 0;
+                        return $quantity + $qty;
+                    }, 0);
+
+                    $totalAutoAddedQty = $totalAutoAddedQty * $numDays;
+
+                    $firstAutoAddedService = array_shift($autoAddedServices);
+                    $idTaxRuleGroup = $firstAutoAddedService['id_tax_rules_group'];
+
+                    // If tax group is different from order detail, add tax info separately
+                    if ($order_detail['id_tax_rules_group'] != $idTaxRuleGroup) {
+                        $autoAddedServiceTaxManager = TaxManagerFactory::getManager($objAddress, (int)$idTaxRuleGroup);
+                        $autoAddedServiceTaxCalculator = $autoAddedServiceTaxManager->getTaxCalculator();
+                        // Calculate tax for the total price
+                        $additionalTaxAmounts = $autoAddedServiceTaxCalculator->getTaxesAmount($autoAddedPriceExcl);
+                        foreach ($additionalTaxAmounts as $taxId => $amount) {
+                            $objTax = new Tax((int)$taxId);
+                            $groupedTaxDetails[$taxId] = array(
+                                'id_order_detail' => $firstAutoAddedService['id_order_detail'],
+                                'id_tax' => $taxId,
+                                'tax_rate' => $objTax->rate,
+                                'unit_tax_base' => $autoAddedPriceExcl / $totalAutoAddedQty,
+                                'total_tax_base' => $autoAddedPriceExcl,
+                                'unit_amount' => $amount,
+                                'total_amount' => Tools::processPriceRounding($amount, $totalAutoAddedQty),
+                            );
+                        }
+                    } else {
+                        // Calculate tax for the total price
+                        $additionalTaxAmounts = $tax_calculator->getTaxesAmount($autoAddedPriceExcl);
+                        $totalTaxBase += $autoAddedPriceExcl;
+                    }
+                }
+
+                $taxBaseShare = $totalTaxBase;
+
+                // In case of Order Invoice, we need to calculate the tax base share as there are services
+                // which have different tax group with room types. So we are using order detail tax data
+                foreach ($taxesList as $detailTax) {
+                    if ($detailTax['total_amount'] > 0) {
+                        $taxId = $detailTax['id_tax'];
+
+                        $unitAmount = $detailTax['unit_amount'] + ($additionalTaxAmounts[$taxId] ?? 0);
+                        $totalAmount = $detailTax['total_amount'] + ($additionalTaxAmounts[$taxId] ?? 0);
+
+                        if (!isset($groupedTaxDetails[$taxId])) {
+                            $groupedTaxDetails[$taxId] = array(
+                                'id_order_detail' => $id_order_detail,
+                                'id_tax' => $taxId,
+                                'tax_rate' => $tax_rates[$taxId],
+                                'unit_tax_base' => $unit_price_tax_excl,
+                                'total_tax_base' => $taxBaseShare,
+                                // When order cancelled order detail amount is set to 0 but not the order detail tax. So we check is there any amount where the tax can be applied otherwise tax is 0
+                                'unit_amount' => $taxBaseShare > 0 ? $unitAmount : 0,
+                                'total_amount' => $taxBaseShare > 0 ? $totalAmount : 0,
+                            );
+                        } else {
+                            if ($taxBaseShare > 0) {
+                                $groupedTaxDetails[$taxId]['unit_amount'] += $unitAmount;
+                                $groupedTaxDetails[$taxId]['total_amount'] += $totalAmount;
+                            }
+                        }
+                    }
+                }
+            } else {
+                $taxBaseShare = $totalTaxBase;
+                $taxManager = TaxManagerFactory::getManager($objAddress, (int)$order_detail['id_tax_rules_group']);
+                $tax_calculator = $taxManager->getTaxCalculator();
+
+                foreach ($tax_calculator->getTaxesAmount($unit_price_tax_excl) as $id_tax => $unit_amount) {
+                    $total_tax_base = 0;
+                    $total_amount = Tools::processPriceRounding($unit_amount, $quantity);
+
+                    if (!isset($groupedTaxDetails[$id_tax])) {
+                        $groupedTaxDetails[$id_tax] = array(
+                            'id_order_detail' => $id_order_detail,
+                            'id_tax' => $id_tax,
+                            'tax_rate' => $tax_rates[$id_tax],
+                            'unit_tax_base' => $unit_price_tax_excl,
+                            'total_tax_base' => $taxBaseShare,
+                            'unit_amount' => $taxBaseShare > 0 ? $unit_amount : 0,
+                            'total_amount' => $taxBaseShare > 0 ? $total_amount : 0
+                        );
+                    } else {
+                        if ($taxBaseShare > 0) {
+                            $groupedTaxDetails[$id_tax]['unit_amount'] += $unit_amount;
+                            $groupedTaxDetails[$id_tax]['total_amount'] += $total_amount;
+                        }
+                    }
                 }
             }
 
@@ -2633,7 +2742,7 @@ class OrderCore extends ObjectModel
 
             /*
              * This tax recalculation logic is intentionally disabled.
-             * 
+             *
              * Taxes have already been calculated and stored in the `order_detail_tax` table,
              * so there is no need to recompute them here.
              *
@@ -2813,7 +2922,7 @@ class OrderCore extends ObjectModel
                         $this->id,
                         0,
                         isset($product['id']) ? $product['id'] : 0,
-                        isset($product['id_service_product_order_detail']) ? $product['id_service_product_order_detail'] : 0,
+                        isset($product['id_service_product_order_detail']) ? $product['id_service_product_order_detail'] : 0
                     )) {
                         $refundDetail = reset($refundDetail);
                         if ($refundDetail['refunded']) {

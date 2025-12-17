@@ -1,21 +1,24 @@
 <?php
 /**
-* 2010-2020 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through this link for complete license : https://store.webkul.com/license.html
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to https://store.webkul.com/customisation-guidelines/ for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
-*  @author    Webkul IN <support@webkul.com>
-*  @copyright 2010-2020 Webkul IN
-*  @license   https://store.webkul.com/license.html
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
 class HotelBookingDetail extends ObjectModel
@@ -3453,7 +3456,7 @@ class HotelBookingDetail extends ObjectModel
                             }
 
                             $objOrderDetail->total_price_tax_excl -= (float) Tools::processPriceRounding(
-                                $objOrderDetail->total_price_tax_excl,
+                                $objServiceProductOrderDetail->total_price_tax_excl,
                                 1,
                                 $objOrder->round_type,
                                 $objOrder->round_mode
@@ -3461,14 +3464,18 @@ class HotelBookingDetail extends ObjectModel
                             $objOrderDetail->total_price_tax_excl = $objOrderDetail->total_price_tax_excl > 0 ? $objOrderDetail->total_price_tax_excl : 0;
 
                             $objOrderDetail->total_price_tax_incl -= (float) Tools::processPriceRounding(
-                                $objOrderDetail->total_price_tax_incl,
+                                $objServiceProductOrderDetail->total_price_tax_incl,
                                 1,
                                 $objOrder->round_type,
                                 $objOrder->round_mode
                             );
                             $objOrderDetail->total_price_tax_incl = $objOrderDetail->total_price_tax_incl > 0 ? $objOrderDetail->total_price_tax_incl : 0;
 
-                            $objOrderDetail->save();
+                            $objServiceProductOrderDetail->total_price_tax_excl = 0;
+                            $objServiceProductOrderDetail->total_price_tax_incl = 0;
+                            $objServiceProductOrderDetail->save();
+
+                            $objOrderDetail->updateTaxAmount($objOrder) && $objOrderDetail->save();
                         }
 
                         $objServiceProductOrderDetail->total_price_tax_excl = 0;
@@ -3537,6 +3544,16 @@ class HotelBookingDetail extends ObjectModel
                         $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
 
                         $objOrder->save();
+
+                        // Update OrderInvoice
+                        if ($objOrder->hasInvoice()) {
+                            $objOrderInvoice = new OrderInvoice($objOrderDetail->id_order_invoice);
+                            $objOrderInvoice->total_products -= $reduction_amount['total_products_tax_excl'];
+                            $objOrderInvoice->total_products_wt -= $reduction_amount['total_products_tax_incl'];
+                            $objOrderInvoice->total_paid_tax_excl -= $reduction_amount['total_price_tax_excl'];
+                            $objOrderInvoice->total_paid_tax_incl -= $reduction_amount['total_price_tax_incl'];
+                            $objOrderInvoice->update();
+                        }
                     }
                 }
 

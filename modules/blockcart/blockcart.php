@@ -34,7 +34,7 @@ class Blockcart extends Module
     {
         $this->name = 'blockcart';
         $this->tab = 'front_office_features';
-        $this->version = '1.6.6';
+        $this->version = '1.6.7';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 
@@ -49,6 +49,9 @@ class Blockcart extends Module
     public function getContentVars($params)
     {
         global $errors;
+
+        // validate cart bookings before displaying cart
+        HotelCartBookingData::validateCartBookings();
 
         // Set currency
         if ((int) $params['cart']->id_currency && (int) $params['cart']->id_currency != $this->context->currency->id) {

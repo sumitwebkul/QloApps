@@ -1020,6 +1020,7 @@ class AdminCartsControllerCore extends AdminController
         }
 
         if ($this->tabAccess['edit'] === 1) {
+            Cache::clean('getContextualValue_*');
             HotelRoomTypeFeaturePricing::deleteFeaturePrices($id_cart, $id_product, $id_room, $date_from, $date_to);
             HotelRoomTypeFeaturePricing::createRoomTypeFeaturePrice(
                 array(
@@ -1204,6 +1205,10 @@ class AdminCartsControllerCore extends AdminController
 
             if ($serviceProducts) {
                 foreach ($serviceProducts as $key => $servProduct) {
+                    $numDays = 1;
+                    if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $servProduct['price_calculation_method']) {
+                        $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+                    }
                     $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
                         $servProduct['id_product'],
                         0,
@@ -1214,7 +1219,7 @@ class AdminCartsControllerCore extends AdminController
                         $dateFrom,
                         $dateTo,
                         $idCart
-                    );
+                    )/$numDays;
                 }
             }
 
@@ -1663,8 +1668,10 @@ class AdminCartsControllerCore extends AdminController
                                         0,
                                         1,
                                         0,
-                                        $objCart->id_customer,
-                                        $objCart->id
+                                        0,
+                                        $objCart->id,
+                                        0,
+                                        $objHotelCartBookingData->id
                                     )) {
                                         $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
                                     } else {
@@ -1676,12 +1683,13 @@ class AdminCartsControllerCore extends AdminController
                                     $objSpecificPrice->id_currency = $objCart->id_currency;
                                     $objSpecificPrice->id_country = 0;
                                     $objSpecificPrice->id_group = 0;
-                                    $objSpecificPrice->id_customer = $objCart->id_customer;
+                                    $objSpecificPrice->id_customer = 0;
                                     $objSpecificPrice->id_product = $idServiceProduct;
                                     $objSpecificPrice->id_product_attribute = 0;
                                     $objSpecificPrice->price = $unitPrice;
                                     $objSpecificPrice->from_quantity = 1;
                                     $objSpecificPrice->reduction = 0;
+                                    $objSpecificPrice->id_htl_cart_booking = $objHotelCartBookingData->id;
                                     $objSpecificPrice->reduction_type = 'amount';
                                     $objSpecificPrice->reduction_tax = 0;
                                     $objSpecificPrice->from = '0000-00-00 00:00:00';
