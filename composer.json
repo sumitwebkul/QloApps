@@ -7,7 +7,7 @@
         "ext-zip": "*",
         "ext-soap": "*"
     },
-    "name": "webkul/qloapps",
+    "name": "qllaoapps/qlssssoapps",
     "description": "QloApps is an Open-source and Free hotel reservation system and booking engine. With the help of QloApps, you can launch your hotel booking website without any cost and take & manage online bookings.",
     "type": "project",
     "license": "OSL-3.0",
